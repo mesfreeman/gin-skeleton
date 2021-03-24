@@ -50,8 +50,8 @@ func SignAuth() gin.HandlerFunc {
 		if math.Abs(float64(time.Now().Unix()-int64(timestamp))) > restMaxTime {
 			logger.Warnln("签名已过期")
 			helper.InvalidAuthJSON("签名已过期", c)
-			// c.Abort()
-			// return
+			c.Abort()
+			return
 		}
 
 		// 签名校验
