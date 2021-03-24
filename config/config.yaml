@@ -1,0 +1,5 @@
+# APP相关配置
+app:
+  name: "gin-skeleton" # 应用名称
+  mode: "debug"        # 模式：debug|test|release
+  port: 8888           # 端口号
