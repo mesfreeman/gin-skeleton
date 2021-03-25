@@ -99,5 +99,5 @@ func paramSign(appSecret string, params map[string][]string) string {
 	signStr += appSecret
 
 	// MD5加密
-	return util.MD5(signStr)
+	return util.GetMD5(signStr)
 }
