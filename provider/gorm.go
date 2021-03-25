@@ -14,7 +14,7 @@ import (
 // GormDB初始化
 func InitGormDB() {
 	// 扩展其它库 ...
-	helper.GormMysqlDb = gormMysql("mysql")
+	helper.GormDefaultDb = gormMysql("default")
 }
 
 // MYSQL驱动

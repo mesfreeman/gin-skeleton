@@ -10,7 +10,7 @@ app:
 
 # GORM_V2
 gorm:
-  mysql:
+  default:
     driver: "mysql"
     host: "127.0.0.1"
     database: "gin-skeleton"
