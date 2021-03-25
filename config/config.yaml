@@ -7,3 +7,14 @@ app:
   logMaxSaveDay: 7             # 日志最大保存天数
   logOutFormat: "json"         # 日志输出格式：json, text
   logOutPath: "console"        # 日志输出路径：console, file
+
+# GORM_V2
+gorm:
+  dbType: "mysql"
+  mysql:
+    host: "127.0.0.1"
+    database: "gin-skeleton"
+    port: 3306
+    username: "root"
+    password: "root"
+    charset: "utf8mb4"
