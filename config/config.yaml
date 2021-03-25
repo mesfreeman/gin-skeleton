@@ -1,5 +1,9 @@
 # APP相关配置
 app:
   name: "gin-skeleton"         # 应用名称
-  mode: "development"          # 模式:development|test|production
+  mode: "development"          # 模式：development, test, production
   port: 8888                   # 端口号
+  logLevel: "debug"            # 日志等级：debug, info, error, warn, panic, fatal
+  logMaxSaveDay: 7             # 日志最大保存天数
+  logOutFormat: "json"         # 日志输出格式：json, text
+  logOutPath: "console"        # 日志输出路径：console, file
