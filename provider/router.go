@@ -4,10 +4,16 @@ import (
 	"gin-skeleton/router"
 
 	"github.com/gin-gonic/gin"
+	"github.com/spf13/viper"
 )
 
 // Routers 路由
 func Routers() *gin.Engine {
+	if viper.GetString("app.mode") == "production" {
+		gin.SetMode(gin.ReleaseMode)
+		gin.DisableConsoleColor()
+	}
+
 	var Router = gin.Default()
 
 	// 公共路由
