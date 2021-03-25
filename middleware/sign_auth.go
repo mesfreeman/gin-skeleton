@@ -17,7 +17,7 @@ const (
 )
 
 // 密钥映射
-var appSecretMapper map[int]string = map[int]string{
+var appSecretMapper = map[int]string{
 	10000: "yghi6vnwpc35kmj1tdxbea7zq02o8lf4",
 }
 
