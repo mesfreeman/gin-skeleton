@@ -1,9 +1,8 @@
 package middleware
 
 import (
-	"crypto/md5"
-	"encoding/hex"
 	"gin-skeleton/helper"
+	"gin-skeleton/util"
 	"math"
 	"sort"
 	"strconv"
@@ -100,7 +99,5 @@ func paramSign(appSecret string, params map[string][]string) string {
 	signStr += appSecret
 
 	// MD5加密
-	h := md5.New()
-	h.Write([]byte(signStr))
-	return hex.EncodeToString(h.Sum(nil))
+	return util.MD5(signStr)
 }
