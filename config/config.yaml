@@ -10,8 +10,8 @@ app:
 
 # GORM_V2
 gorm:
-  dbType: "mysql"
   mysql:
+    driver: "mysql"
     host: "127.0.0.1"
     database: "gin-skeleton"
     port: 3306

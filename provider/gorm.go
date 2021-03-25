@@ -2,6 +2,7 @@ package provider
 
 import (
 	"fmt"
+	"gin-skeleton/helper"
 	"time"
 
 	"github.com/sirupsen/logrus"
@@ -10,20 +11,20 @@ import (
 	"gorm.io/gorm"
 )
 
-// Gorm初始化
-func InitGorm() *gorm.DB {
-	// 扩展其它类型
-	return gormMysql()
+// GormDB初始化
+func InitGormDB() {
+	// 扩展其它库 ...
+	helper.GormMysqlDb = gormMysql("mysql")
 }
 
-// Mysql
-func gormMysql() *gorm.DB {
-	host := viper.GetString("gorm.mysql.host")
-	database := viper.GetString("gorm.mysql.database")
-	port := viper.GetInt("gorm.mysql.port")
-	username := viper.GetString("gorm.mysql.username")
-	password := viper.GetString("gorm.mysql.password")
-	charset := viper.GetString("gorm.mysql.charset")
+// MYSQL驱动
+func gormMysql(connection string) *gorm.DB {
+	host := viper.GetString("gorm." + connection + ".host")
+	database := viper.GetString("gorm." + connection + ".database")
+	port := viper.GetInt("gorm." + connection + ".port")
+	username := viper.GetString("gorm." + connection + ".username")
+	password := viper.GetString("gorm." + connection + ".password")
+	charset := viper.GetString("gorm." + connection + ".charset")
 
 	// 拼接mysql相关配置
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=%s&parseTime=True&loc=Local", username, password, host, port, database, charset)

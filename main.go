@@ -17,6 +17,7 @@ func main() {
 	// 初始化配置
 	provider.InitConfig()
 	provider.InitLogger()
+	provider.InitGormDB()
 
 	// 服务配置
 	router := provider.Routers()
