@@ -1,6 +1,8 @@
-package util
+package helper
 
 import (
+	"crypto/md5"
+	"encoding/hex"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -13,4 +15,11 @@ func GetRootPath() string {
 		panic(fmt.Sprintf("get project root path faild: %s", err))
 	}
 	return rootPath
+}
+
+// MD5 加密
+func GetMD5(str string) string {
+	md5Ctx := md5.New()
+	md5Ctx.Write([]byte(str))
+	return hex.EncodeToString(md5Ctx.Sum(nil))
 }

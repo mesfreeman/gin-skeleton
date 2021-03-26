@@ -1,7 +1,7 @@
 package provider
 
 import (
-	"gin-skeleton/util"
+	"gin-skeleton/helper"
 	"log"
 	"os"
 	"path"
@@ -48,7 +48,7 @@ func InitLogger() {
 	switch viper.GetString("app.logOutPath") {
 	case "file":
 		// 日志打印到指定的目录
-		logFileName := path.Join(util.GetRootPath(), "storage", "logs", viper.GetString("app.name"), ".log")
+		logFileName := path.Join(helper.GetRootPath(), "storage", "logs", viper.GetString("app.name"), ".log")
 		logOut, err := os.OpenFile(logFileName, os.O_APPEND|os.O_WRONLY|os.O_CREATE, os.ModeAppend)
 		if err != nil {
 			log.Fatal("Open log file fail: ", err)

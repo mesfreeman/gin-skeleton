@@ -2,7 +2,7 @@ package middleware
 
 import (
 	"gin-skeleton/helper"
-	"gin-skeleton/util"
+	"gin-skeleton/helper/response"
 	"math"
 	"sort"
 	"strconv"
@@ -33,7 +33,7 @@ func SignAuth() gin.HandlerFunc {
 		// 参数校验
 		if appId == 0 || signature == "" || timestamp == 0 {
 			logger.Warnln("部分签名参数缺失")
-			helper.InvalidArgumentJSON("部分签名参数缺失", c)
+			response.InvalidArgumentJSON("部分签名参数缺失", c)
 			c.Abort()
 			return
 		}
@@ -41,14 +41,14 @@ func SignAuth() gin.HandlerFunc {
 		appSecret, ok := appSecretMapper[appId]
 		if !ok {
 			logger.Warnln("appId不存在")
-			helper.InvalidAuthJSON("appId不存在", c)
+			response.InvalidAuthJSON("appId不存在", c)
 			c.Abort()
 			return
 		}
 
 		if math.Abs(float64(time.Now().Unix()-int64(timestamp))) > restMaxTime {
 			logger.Warnln("签名已过期")
-			helper.InvalidAuthJSON("签名已过期", c)
+			response.InvalidAuthJSON("签名已过期", c)
 			c.Abort()
 			return
 		}
@@ -57,7 +57,7 @@ func SignAuth() gin.HandlerFunc {
 		signRet := paramSign(appSecret, params)
 		if signature != signRet {
 			logger.Warnln("签名验证失败", signRet, signature)
-			helper.InvalidAuthJSON("签名验证失败", c)
+			response.InvalidAuthJSON("签名验证失败", c)
 			c.Abort()
 			return
 		}
@@ -99,5 +99,5 @@ func paramSign(appSecret string, params map[string][]string) string {
 	signStr += appSecret
 
 	// MD5加密
-	return util.GetMD5(signStr)
+	return helper.GetMD5(signStr)
 }

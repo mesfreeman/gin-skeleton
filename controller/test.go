@@ -1,7 +1,7 @@
 package controller
 
 import (
-	"gin-skeleton/helper"
+	"gin-skeleton/helper/response"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -19,5 +19,5 @@ func Test(c *gin.Context) {
 		"mode":     viper.GetString("app.mode"),
 	}
 
-	helper.SuccessJSON(result, "success", c)
+	response.SuccessJSON(result, "success", c)
 }
