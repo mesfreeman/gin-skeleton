@@ -9,6 +9,7 @@ import (
 	"github.com/spf13/viper"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+	"gorm.io/gorm/schema"
 )
 
 // GormDB初始化
@@ -38,7 +39,11 @@ func gormMysql(connection string) *gorm.DB {
 	}
 
 	// 打开链接
-	db, err := gorm.Open(mysql.New(mysqlConfig), &gorm.Config{})
+	db, err := gorm.Open(mysql.New(mysqlConfig), &gorm.Config{
+		NamingStrategy: schema.NamingStrategy{
+			SingularTable: true,
+		},
+	})
 	if err != nil {
 		logrus.WithFields(logrus.Fields{"connection": connection, "err": err}).Fatalln("Gorm mysql start err")
 		return nil
