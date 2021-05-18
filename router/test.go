@@ -11,9 +11,5 @@ func InitTestRouter(Router *gin.RouterGroup) {
 	TestRouter := Router.Group("test")
 	{
 		TestRouter.GET("test", controller.Test)
-		TestRouter.GET("add", controller.Add)
-		TestRouter.GET("delete", controller.Delete)
-		TestRouter.GET("modify", controller.Modify)
-		TestRouter.GET("view", controller.View)
 	}
 }
