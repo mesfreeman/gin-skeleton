@@ -1,0 +1,23 @@
+[
+    {
+        "name": "gin-skeleton",
+        "cwd": "/data/services/projects/gin-skeleton/code/release",
+        "script": "./gin-skeleton",
+        "args": "",
+        "exec_mode": "fork",
+        "watch": true,
+        "ignore_watch": [
+            "config",
+            "storage",
+            ".gitignore"
+        ],
+        "watch_options": {
+            "usePolling": true
+        },
+        "min_uptime": "60s",
+        "max_memory_restart": "512M",
+        "max_restarts": 5,
+        "error_file": "/data/services/sites/gin-skeleton/log/queue-error.log",
+        "out_file": "/data/services/sites/gin-skeleton/log/queue-out.log"
+    }
+]
