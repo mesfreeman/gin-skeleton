@@ -40,7 +40,7 @@ func gormMysql(connection string) *gorm.DB {
 	// 打开链接
 	db, err := gorm.Open(mysql.New(mysqlConfig))
 	if err != nil {
-		logrus.WithFields(logrus.Fields{"connection": connection, "err": err}).Fatalln("Gorm mysql start err")
+		helper.GetLogger("").WithFields(logrus.Fields{"connection": connection, "err": err}).Fatalln("Gorm mysql start err")
 		return nil
 	}
 

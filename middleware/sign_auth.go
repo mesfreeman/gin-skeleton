@@ -28,7 +28,7 @@ func SignAuth() gin.HandlerFunc {
 		signature := c.Query("signature")
 		timestamp, _ := strconv.Atoi(c.Query("timestamp"))
 		params := c.Request.URL.Query()
-		logger := logrus.WithFields(logrus.Fields{"params": params})
+		logger := helper.GetLogger("sign").WithFields(logrus.Fields{"params": params})
 
 		// 参数校验
 		if appId == 0 || signature == "" || timestamp == 0 {

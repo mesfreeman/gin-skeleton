@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"gin-skeleton/helper"
 	"gin-skeleton/provider"
 	"net/http"
 	"os"
@@ -16,8 +17,7 @@ import (
 func main() {
 	// 初始化配置
 	provider.InitConfig()
-	provider.InitLogger()
-	provider.InitGormDB()
+	// provider.InitGormDB() // @todo 暂时不用
 
 	// 服务配置
 	router := provider.Routers()
@@ -31,19 +31,19 @@ func main() {
 
 	go func() {
 		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			logrus.WithFields(logrus.Fields{"err": err, "pid": syscall.Getpid()}).Fatalln("Listen server error")
+			helper.GetLogger("").WithFields(logrus.Fields{"err": err, "pid": syscall.Getpid()}).Fatalln("Listen server error")
 		}
 	}()
 
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	<-quit
-	logrus.Warnln("Shutdown server ...")
+	helper.GetLogger("").Warnln("Shutdown server ...")
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	if err := server.Shutdown(ctx); err != nil {
-		logrus.WithFields(logrus.Fields{"err": err}).Fatalln("Shutdown server error ...")
+		helper.GetLogger("").WithFields(logrus.Fields{"err": err}).Fatalln("Shutdown server error ...")
 	}
-	logrus.Warnln("Server exiting")
+	helper.GetLogger("").Warnln("Server exiting")
 }
