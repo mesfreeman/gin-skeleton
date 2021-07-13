@@ -17,7 +17,7 @@ import (
 func main() {
 	// 初始化配置
 	provider.InitConfig()
-	provider.InitGormDB() // @todo 暂时不用
+	provider.InitGormDB()
 	provider.InitRedisDB()
 
 	// 服务配置
