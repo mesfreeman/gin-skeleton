@@ -13,8 +13,16 @@ gorm:
   default:
     driver: "mysql"
     host: "127.0.0.1"
-    database: "gin-skeleton"
     port: 3306
+    database: "gin-skeleton"
     username: "root"
     password: "root"
     charset: "utf8mb4"
+
+# Redis
+redis:
+  default:
+    host: "127.0.0.1"
+    port: 6379
+    database: 0
+    password: ""

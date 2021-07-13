@@ -3,8 +3,9 @@ module gin-skeleton
 go 1.13
 
 require (
-	github.com/fsnotify/fsnotify v1.4.7
+	github.com/fsnotify/fsnotify v1.4.9
 	github.com/gin-gonic/gin v1.6.3
+	github.com/go-redis/redis/v8 v8.11.0
 	github.com/lestrrat-go/file-rotatelogs v2.4.0+incompatible
 	github.com/lestrrat-go/strftime v1.0.4 // indirect
 	github.com/mattn/go-sqlite3 v2.0.3+incompatible // indirect

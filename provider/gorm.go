@@ -20,8 +20,8 @@ func InitGormDB() {
 // MYSQL驱动
 func gormMysql(connection string) *gorm.DB {
 	host := viper.GetString("gorm." + connection + ".host")
-	database := viper.GetString("gorm." + connection + ".database")
 	port := viper.GetInt("gorm." + connection + ".port")
+	database := viper.GetString("gorm." + connection + ".database")
 	username := viper.GetString("gorm." + connection + ".username")
 	password := viper.GetString("gorm." + connection + ".password")
 	charset := viper.GetString("gorm." + connection + ".charset")

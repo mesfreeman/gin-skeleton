@@ -18,6 +18,7 @@ func main() {
 	// 初始化配置
 	provider.InitConfig()
 	// provider.InitGormDB() // @todo 暂时不用
+	// provider.InitRedisDB() // @todo 暂时不用
 
 	// 服务配置
 	router := provider.Routers()
