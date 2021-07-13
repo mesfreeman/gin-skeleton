@@ -26,8 +26,7 @@ func getRedisDb(connection string) *redis.Client {
 		DB:       database,
 	})
 
-	_, err := rdb.Ping(rdb.Context()).Result()
-	if err != nil {
+	if err := rdb.Ping(rdb.Context()).Err(); err != nil {
 		helper.GetLogger("").WithFields(logrus.Fields{"connection": connection, "err": err}).Fatalln("Redis start err")
 		return nil
 	}
