@@ -4,7 +4,6 @@ import (
 	"gin-skeleton/helper"
 	"gin-skeleton/helper/response"
 	"math"
-	"sort"
 	"strconv"
 	"time"
 
@@ -13,50 +12,62 @@ import (
 )
 
 const (
-	restMaxTime = 300 // 防重放攻击最大间隔，单位：秒
+	// 防重放攻击最大间隔，单位：秒
+	restMaxTime = 600
 )
 
 // 密钥映射
-var appSecretMapper = map[int]string{
+var secretKeys = map[int]string{
 	10000: "yghi6vnwpc35kmj1tdxbea7zq02o8lf4",
 }
 
 // 签名授权
 func SignAuth() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		appId, _ := strconv.Atoi(c.Query("appId"))
-		signature := c.Query("signature")
-		timestamp, _ := strconv.Atoi(c.Query("timestamp"))
-		params := c.Request.URL.Query()
-		logger := helper.GetLogger("sign").WithFields(logrus.Fields{"params": params})
+		var params struct {
+			AccessKey int    `form:"accessKey" json:"accessKey" uri:"accessKey"`
+			Signature string `form:"signature" json:"signature" uri:"signature"`
+			Timestamp int    `form:"timestamp" json:"timestamp" uri:"timestamp"`
+			Nonce     string `form:"noce" json:"noce" uri:"noce"`
+		}
+		c.ShouldBind(&params)
+		logger := helper.GetLogger("sign").WithFields(logrus.Fields{"params": c.Request.Form})
 
 		// 参数校验
-		if appId == 0 || signature == "" || timestamp == 0 {
-			logger.Warnln("部分签名参数缺失")
-			response.InvalidArgumentJSON("部分签名参数缺失", c)
+		if params.AccessKey == 0 || params.Signature == "" || params.Timestamp == 0 || params.Nonce == "" {
+			logger.Warnln("签名参数缺失")
+			response.InvalidArgumentJSON("签名参数缺失", c)
 			c.Abort()
 			return
 		}
 
-		appSecret, ok := appSecretMapper[appId]
-		if !ok {
-			logger.Warnln("appId不存在")
-			response.InvalidAuthJSON("appId不存在", c)
+		// nonce唯一性检查，10分钟内唯一，防止重放攻击
+		redisKey := "signAuthNonce:" + strconv.Itoa(params.AccessKey) + ":" + params.Nonce
+		if helper.RedisDefaultDb.Exists(helper.RedisDefaultDb.Context(), redisKey).Val() > 0 {
+			logger.Warnln("重复请求")
+			response.InvalidAuthJSON("重复请求", c)
 			c.Abort()
 			return
 		}
-
-		if math.Abs(float64(time.Now().Unix()-int64(timestamp))) > restMaxTime {
+		if math.Abs(float64(time.Now().Unix()-int64(params.Timestamp))) > restMaxTime {
 			logger.Warnln("签名已过期")
 			response.InvalidAuthJSON("签名已过期", c)
 			c.Abort()
 			return
 		}
 
+		secretKey, ok := secretKeys[params.AccessKey]
+		if !ok {
+			logger.Warnln("密钥不存在")
+			response.InvalidAuthJSON("密钥不存在", c)
+			c.Abort()
+			return
+		}
+
 		// 签名校验
-		signRet := paramSign(appSecret, params)
-		if signature != signRet {
-			logger.Warnln("签名验证失败", signRet, signature)
+		localSignature := helper.GetMD5("accessKey=" + strconv.Itoa(params.AccessKey) + "&secretKey=" + secretKey + "&timestamp=" + strconv.Itoa(params.Timestamp) + "&nonce=" + params.Nonce)
+		if params.Signature != localSignature {
+			logger.Warnln("签名验证失败", params.Signature, localSignature)
 			response.InvalidAuthJSON("签名验证失败", c)
 			c.Abort()
 			return
@@ -64,40 +75,4 @@ func SignAuth() gin.HandlerFunc {
 
 		c.Next()
 	}
-}
-
-// 参数签名
-func paramSign(appSecret string, params map[string][]string) string {
-	// 去掉部分参数
-	delete(params, "signature")
-
-	// 对参数名排序
-	paramKeys := make([]string, 0, len(params))
-	for key := range params {
-		paramKeys = append(paramKeys, key)
-	}
-
-	// 兼容PHP的ksort 数字会在字母后面
-	sort.Slice(paramKeys, func(i, j int) bool {
-		_, err1 := strconv.Atoi(paramKeys[i])
-		_, err2 := strconv.Atoi(paramKeys[j])
-		if err1 == nil && err2 != nil {
-			return false
-		}
-		if err1 != nil && err2 == nil {
-			return true
-		}
-		return paramKeys[j] > paramKeys[i]
-	})
-
-	// 拼接签名字符串
-	signStr := ""
-	for _, key := range paramKeys {
-		// 注意：不支持数组或对象参数
-		signStr += key + "=" + params[key][0]
-	}
-	signStr += appSecret
-
-	// MD5加密
-	return helper.GetMD5(signStr)
 }
