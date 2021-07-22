@@ -73,7 +73,7 @@ func SignAuth() gin.HandlerFunc {
 			return
 		}
 
-		helper.RedisDefaultDb.SetEX(helper.RedisDefaultDb.Context(), redisKey, 1, restMaxTime)
+		helper.RedisDefaultDb.SetEX(helper.RedisDefaultDb.Context(), redisKey, 1, restMaxTime*time.Second)
 		c.Next()
 	}
 }
