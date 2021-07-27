@@ -25,4 +25,8 @@ redis:
     host: "127.0.0.1"
     port: 6379
     database: 0
-    password: "123456"
+    password: "root"
+
+# 授权密钥对
+secretKeys:
+  10000: "35kmjtdxbyxhm6vywpc1ea7zq02o8lf4" # 项目密钥

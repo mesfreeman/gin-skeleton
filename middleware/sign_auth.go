@@ -9,17 +9,13 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
 )
 
 const (
 	// 防重放攻击最大间隔，单位：秒
 	restMaxTime = 600
 )
-
-// 密钥映射
-var secretKeys = map[int]string{
-	10000: "yghi6vnwpc35kmj1tdxbea7zq02o8lf4",
-}
 
 // 签名授权
 func SignAuth() gin.HandlerFunc {
@@ -28,7 +24,7 @@ func SignAuth() gin.HandlerFunc {
 			AccessKey int    `form:"accessKey" json:"accessKey" uri:"accessKey"`
 			Signature string `form:"signature" json:"signature" uri:"signature"`
 			Timestamp int    `form:"timestamp" json:"timestamp" uri:"timestamp"`
-			Nonce     string `form:"noce" json:"noce" uri:"noce"`
+			Nonce     string `form:"nonce" json:"nonce" uri:"nonce"`
 		}
 		c.ShouldBind(&params)
 		logger := helper.GetLogger("sign").WithFields(logrus.Fields{"params": c.Request.Form})
@@ -56,8 +52,8 @@ func SignAuth() gin.HandlerFunc {
 			return
 		}
 
-		secretKey, ok := secretKeys[params.AccessKey]
-		if !ok {
+		secretKey := viper.GetString("secretKeys." + strconv.Itoa(params.AccessKey))
+		if secretKey == "" {
 			logger.Warnln("密钥不存在")
 			response.InvalidAuthJSON("密钥不存在", c)
 			c.Abort()
