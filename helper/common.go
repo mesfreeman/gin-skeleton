@@ -8,6 +8,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"sync"
 	"time"
 
 	rotatelogs "github.com/lestrrat-go/file-rotatelogs"
@@ -17,7 +18,7 @@ import (
 )
 
 // 日志对象集合
-var loggerMap = map[string]*logrus.Logger{}
+var loggerMap sync.Map
 
 // 获取日志对象
 func GetLogger(fileName string) *logrus.Logger {
@@ -33,8 +34,8 @@ func GetLogger(fileName string) *logrus.Logger {
 
 	// 如果存在，直接返回
 	key := fmt.Sprintf("%s_%s_%s_%s_%d", fileName, logLevel, logOutFormat, logOutPath, logMaxSaveDay)
-	if logger, ok := loggerMap[key]; ok {
-		return logger
+	if logger, ok := loggerMap.Load(key); ok {
+		return logger.(*logrus.Logger)
 	}
 
 	// 创建日志对象
@@ -106,8 +107,8 @@ func GetLogger(fileName string) *logrus.Logger {
 		logger.SetOutput(os.Stdout)
 	}
 
-	loggerMap[key] = logger
-	return loggerMap[key]
+	loggerMap.Store(key, logger)
+	return logger
 }
 
 // 获取项目根目录
