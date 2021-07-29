@@ -25,8 +25,8 @@ func main() {
 	server := &http.Server{
 		Addr:           ":" + viper.GetString("app.port"),
 		Handler:        router,
-		ReadTimeout:    10 * time.Second,
-		WriteTimeout:   10 * time.Second,
+		ReadTimeout:    30 * time.Second,
+		WriteTimeout:   30 * time.Second,
 		MaxHeaderBytes: 1 << 20,
 	}
 
