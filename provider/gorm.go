@@ -11,7 +11,7 @@ import (
 	"gorm.io/gorm"
 )
 
-// GormDB初始化
+// InitGormDB GormDB初始化
 func InitGormDB() {
 	// 扩展其它库 ...
 	helper.GormDefaultDb = gormMysql("default")

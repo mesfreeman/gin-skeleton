@@ -6,9 +6,9 @@ import (
 )
 
 var (
-	// mysql默认连接
+	// GormDefaultDb mysql默认连接
 	GormDefaultDb *gorm.DB
 
-	// redis默认连接
+	// RedisDefaultDb redis默认连接
 	RedisDefaultDb *redis.Client
 )

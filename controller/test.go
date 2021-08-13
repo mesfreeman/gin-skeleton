@@ -8,7 +8,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-// 测试动作
+// Test 测试动作
 func Test(c *gin.Context) {
 	// 开发者可以在这里加上自己的任意的测试代码，但是测试代码不应提交到仓库中！
 

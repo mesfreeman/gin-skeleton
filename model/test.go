@@ -1,5 +1,6 @@
 package model
 
+// TestModel 测试
 type TestModel struct {
 	ID        int        `json:"id"`
 	Name      string     `json:"name"`
@@ -8,12 +9,12 @@ type TestModel struct {
 	UpdatedAt FormatTime `json:"updated_at"`
 }
 
-// 表名
+// TableName 表名
 func (TestModel) TableName() string {
 	return "test"
 }
 
-// 创建
+// NewTestModel 创建
 func NewTestModel() *TestModel {
 	return &TestModel{}
 }

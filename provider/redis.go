@@ -9,6 +9,7 @@ import (
 	"github.com/spf13/viper"
 )
 
+// InitRedisDB redis初始化
 func InitRedisDB() {
 	// 扩展其它库 ...
 	helper.RedisDefaultDb = getRedisDb("default")

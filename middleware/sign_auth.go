@@ -17,7 +17,7 @@ const (
 	restMaxTime = 600
 )
 
-// 签名授权
+// SignAuth 签名授权
 func SignAuth() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var params struct {
@@ -26,8 +26,13 @@ func SignAuth() gin.HandlerFunc {
 			Timestamp int    `form:"timestamp" json:"timestamp" uri:"timestamp"`
 			Nonce     string `form:"nonce" json:"nonce" uri:"nonce"`
 		}
-		c.ShouldBind(&params)
+
 		logger := helper.GetLogger("sign").WithFields(logrus.Fields{"params": c.Request.Form})
+		if err := c.ShouldBind(&params); err != nil {
+			response.InvalidArgumentJSON("签名参数格式错误", c)
+			c.Abort()
+			return
+		}
 
 		// 参数校验
 		if params.AccessKey == 0 || params.Signature == "" || params.Timestamp == 0 || params.Nonce == "" {

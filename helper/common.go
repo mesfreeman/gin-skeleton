@@ -20,7 +20,7 @@ import (
 // 日志对象集合
 var loggerMap sync.Map
 
-// 获取日志对象
+// GetLogger 获取日志对象
 func GetLogger(fileName string) *logrus.Logger {
 	if fileName == "" {
 		fileName = viper.GetString("app.name")
@@ -111,7 +111,7 @@ func GetLogger(fileName string) *logrus.Logger {
 	return logger
 }
 
-// 获取项目根目录
+// GetRootPath 获取项目根目录
 func GetRootPath() string {
 	rootPath, err := filepath.Abs(filepath.Dir(os.Args[0]))
 	if err != nil {
@@ -120,7 +120,7 @@ func GetRootPath() string {
 	return rootPath
 }
 
-// MD5 加密
+// GetMD5 MD5 加密
 func GetMD5(str string) string {
 	md5Ctx := md5.New()
 	md5Ctx.Write([]byte(str))

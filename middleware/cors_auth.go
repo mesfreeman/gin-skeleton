@@ -6,10 +6,9 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// 允许跨域请求
+// CorsAuth 允许跨域请求
 func CorsAuth() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		method := c.Request.Method
 		c.Header("Access-Control-Allow-Origin", "*")
 		c.Header("Access-Control-Allow-Headers", "Access-Control-Allow-Headers,Authorization,User-Agent, Keep-Alive, Content-Type, X-Requested-With,X-CSRF-Token,AccessToken,Token")
 		c.Header("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT, PATCH, OPTIONS")
@@ -17,6 +16,7 @@ func CorsAuth() gin.HandlerFunc {
 		c.Header("Access-Control-Allow-Credentials", "true")
 
 		// 放行所有OPTIONS方法
+		method := c.Request.Method
 		if method == "OPTIONS" {
 			c.AbortWithStatus(http.StatusAccepted)
 		}
