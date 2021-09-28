@@ -1,32 +1,39 @@
-# APP相关配置
-app:
-  name: "gin-skeleton"         # 应用名称
-  mode: "development"          # 模式：development, test, production
-  port: 8888                   # 端口号
-  logLevel: "debug"            # 日志等级：debug, info, error, warn, panic, fatal
-  logMaxSaveDay: 7             # 日志最大保存天数
-  logOutFormat: "json"         # 日志输出格式：json, text
-  logOutPath: "console"        # 日志输出路径：console, file
+# 服务相关配置
+Server:
+  Name: "jarvis-backend"       # 应用名称
+  Mode: "development"          # 模式：development, test, production
+  Port: 8888                   # 端口号
 
-# GORM_V2
-gorm:
-  default:
-    driver: "mysql"
-    host: "127.0.0.1"
-    port: 3306
-    database: "gin-skeleton"
-    username: "root"
-    password: "root"
-    charset: "utf8mb4"
+# 日志相关配置
+Logs:
+  Level: "debug"            # 日志等级：debug, info, error, warn, panic, fatal
+  MaxSaveDay: 7             # 日志最大保存天数
+  OutFormat: "text"         # 日志输出格式：json, text
+  OutPath: "console"        # 日志输出路径：console, file
 
-# Redis
-redis:
-  default:
-    host: "127.0.0.1"
-    port: 6379
-    database: 0
-    password: "root"
+# JWT相关配置
+JwtToken:
+  SignKey: "eotXIF6uDFSvli6r48ufE1NDB12uofMT"
 
-# 授权密钥对
-secretKeys:
-  10000: "35kmjtdxbyxhm6vywpc1ea7zq02o8lf4" # 项目密钥
+# 签名相关配置
+SignToken:
+  10000: "zq023m5yxhmkjtdxb6vywpc1ea7o8lf4"
+
+# GORM相关配置
+Gorm:
+  Default:
+    Driver: "mysql"
+    Host: "127.0.0.1"
+    Port: 3306
+    Database: "test"
+    Username: "root"
+    Password: "root"
+    Charset: "utf8mb4"
+
+# Redis相关配置
+Redis:
+  Default:
+    Host: "127.0.0.1"
+    Port: 6379
+    Database: 0
+    Password: "root"

@@ -5,6 +5,7 @@ import (
 	"encoding/hex"
 	"fmt"
 	"log"
+	"math/rand"
 	"os"
 	"path"
 	"path/filepath"
@@ -23,14 +24,14 @@ var loggerMap sync.Map
 // GetLogger 获取日志对象
 func GetLogger(fileName string) *logrus.Logger {
 	if fileName == "" {
-		fileName = viper.GetString("app.name")
+		fileName = viper.GetString("Server.Name")
 	}
 
 	// 日志配置
-	logLevel := viper.GetString("app.logLevel")
-	logOutFormat := viper.GetString("app.logOutFormat")
-	logOutPath := viper.GetString("app.logOutPath")
-	logMaxSaveDay := viper.GetInt("app.logMaxSaveDay")
+	logLevel := viper.GetString("Logs.Level")
+	logOutFormat := viper.GetString("Logs.OutFormat")
+	logOutPath := viper.GetString("Logs.OutPath")
+	logMaxSaveDay := viper.GetInt("Logs.MaxSaveDay")
 
 	// 如果存在，直接返回
 	key := fmt.Sprintf("%s_%s_%s_%s_%d", fileName, logLevel, logOutFormat, logOutPath, logMaxSaveDay)
@@ -70,11 +71,10 @@ func GetLogger(fileName string) *logrus.Logger {
 	switch logOutPath {
 	case "file":
 		// 日志打印到指定的目录
-		logFileName := path.Join(GetRootPath(), "storage", "logs", (fileName + ".log"))
+		logFileName := path.Join(GetRootPath(), "storage", "logs", fileName+".log")
 		logOut, err := os.OpenFile(logFileName, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0664)
 		if err != nil {
 			log.Fatal("Open log file fail: ", err)
-			break
 		}
 		logger.SetOutput(logOut)
 
@@ -120,9 +120,16 @@ func GetRootPath() string {
 	return rootPath
 }
 
-// GetMD5 MD5 加密
+// GetMD5 MD5加密
 func GetMD5(str string) string {
 	md5Ctx := md5.New()
 	md5Ctx.Write([]byte(str))
 	return hex.EncodeToString(md5Ctx.Sum(nil))
+}
+
+// GetRandomString 返回指定长度的随机字符串
+func GetRandomString(n int) string {
+	randBytes := make([]byte, n/2)
+	rand.Read(randBytes)
+	return fmt.Sprintf("%x", randBytes)
 }

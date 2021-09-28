@@ -23,7 +23,7 @@ func main() {
 	// 服务配置
 	router := provider.Routers()
 	server := &http.Server{
-		Addr:           ":" + viper.GetString("app.port"),
+		Addr:           ":" + viper.GetString("Server.Port"),
 		Handler:        router,
 		ReadTimeout:    30 * time.Second,
 		WriteTimeout:   30 * time.Second,

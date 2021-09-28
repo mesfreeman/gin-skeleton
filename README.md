@@ -12,6 +12,7 @@
 * 支持路由文件分隔
 * 支持 `GORM` 查询
 * 支持 `Redis` 查询
+* 支持 `jwt`、`sign` 中间件
 
 ## 部署说明
 
@@ -28,9 +29,12 @@ go build -o release
 cp -R config release
 
 # 建立日志软链
-cd release
-ln -s ../storage storage
+cd release && ln -s ../storage storage
+
+# 修改权限
+sudo chown -R www-data:www-data storage
 ```
+
 ### MAC 环境下
 
 ```sh
@@ -41,6 +45,8 @@ CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o release
 cp -R config release
 
 # 建立日志软链
-cd release
-ln -s ../storage storage
+cd release && ln -s ../storage storage
+
+# 修改权限
+sudo chown -R www-data:www-data storage
 ```

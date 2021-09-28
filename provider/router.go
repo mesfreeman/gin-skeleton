@@ -9,7 +9,7 @@ import (
 
 // Routers 路由
 func Routers() *gin.Engine {
-	if viper.GetString("app.mode") == "production" {
+	if viper.GetString("Server.Mode") == "production" {
 		gin.SetMode(gin.ReleaseMode)
 		gin.DisableConsoleColor()
 	}
@@ -17,7 +17,7 @@ func Routers() *gin.Engine {
 	var Router = gin.Default()
 
 	// 公共路由
-	PublicGroup := Router.Group("")
+	PublicGroup := Router.Group("/")
 	{
 		router.InitTestRouter(PublicGroup)
 	}

@@ -3,6 +3,7 @@ package model
 import (
 	"database/sql/driver"
 	"fmt"
+	"gin-skeleton/helper"
 	"time"
 )
 
@@ -13,7 +14,7 @@ type FormatTime struct {
 
 // MarshalJSON 重写 MarshaJSON 方法，实现格式化时间
 func (f FormatTime) MarshalJSON() ([]byte, error) {
-	output := fmt.Sprintf("\"%s\"", f.Time.Format("2006-01-02 15:04:05"))
+	output := fmt.Sprintf("\"%s\"", f.Time.Format(helper.TimeFormatYmdhis))
 	return []byte(output), nil
 }
 

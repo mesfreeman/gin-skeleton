@@ -1,10 +1,10 @@
 package middleware
 
 import (
+	"fmt"
 	"gin-skeleton/helper"
 	"gin-skeleton/helper/response"
 	"math"
-	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -43,7 +43,7 @@ func SignAuth() gin.HandlerFunc {
 		}
 
 		// nonce唯一性检查，10分钟内唯一，防止重放攻击
-		redisKey := "signAuthNonce:" + strconv.Itoa(params.AccessKey) + ":" + params.Nonce
+		redisKey := fmt.Sprintf("signAuthNonce:%d:%s", params.AccessKey, params.Nonce)
 		if helper.RedisDefaultDb.Exists(helper.RedisDefaultDb.Context(), redisKey).Val() > 0 {
 			logger.Warnln("重复请求")
 			response.InvalidAuthJSON("重复请求", c)
@@ -57,7 +57,7 @@ func SignAuth() gin.HandlerFunc {
 			return
 		}
 
-		secretKey := viper.GetString("secretKeys." + strconv.Itoa(params.AccessKey))
+		secretKey := viper.GetString(fmt.Sprintf("SignToken.%d", params.AccessKey))
 		if secretKey == "" {
 			logger.Warnln("密钥不存在")
 			response.InvalidAuthJSON("密钥不存在", c)
@@ -66,7 +66,7 @@ func SignAuth() gin.HandlerFunc {
 		}
 
 		// 签名校验
-		localSignature := helper.GetMD5("accessKey=" + strconv.Itoa(params.AccessKey) + "&secretKey=" + secretKey + "&timestamp=" + strconv.Itoa(params.Timestamp) + "&nonce=" + params.Nonce)
+		localSignature := helper.GetMD5(fmt.Sprintf("accessKey=%d&secretKey=%s&timestamp=%d&nonce=%s", params.AccessKey, secretKey, params.Timestamp, params.Nonce))
 		if params.Signature != localSignature {
 			logger.Warnln("签名验证失败", params.Signature, localSignature)
 			response.InvalidAuthJSON("签名验证失败", c)

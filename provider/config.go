@@ -7,7 +7,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-// InitConfig 初始化配置
+// InitConfig Config 配置
 func InitConfig() {
 	viper.SetConfigName("config")
 	viper.SetConfigType("yaml")

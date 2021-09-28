@@ -8,8 +8,8 @@ import (
 
 // InitTestRouter 测试接口相关
 func InitTestRouter(Router *gin.RouterGroup) {
-	TestRouter := Router.Group("test")
+	TestRouter := Router.Group("/test")
 	{
-		TestRouter.GET("test", controller.Test)
+		TestRouter.GET("/test", controller.Test)
 	}
 }

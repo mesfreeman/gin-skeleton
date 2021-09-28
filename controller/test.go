@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"gin-skeleton/helper"
 	"gin-skeleton/helper/response"
 	"time"
 
@@ -18,10 +19,10 @@ func Test(c *gin.Context) {
 		ClientIp    string `json:"clientIp"`
 		CurrentTime string `json:"currentTime"`
 	}{
-		Mode:        viper.GetString("app.mode"),
+		Mode:        viper.GetString("Server.Mode"),
 		Welcome:     "hello world!",
 		ClientIp:    c.ClientIP(),
-		CurrentTime: time.Now().Format("2006-01-02 15:04:05"),
+		CurrentTime: time.Now().Format(helper.TimeFormatYmdhis),
 	}
 	response.SuccessJSON(result, "success", c)
 }

@@ -1,8 +1,9 @@
 package provider
 
 import (
+	"fmt"
 	"gin-skeleton/helper"
-	"strconv"
+	"strings"
 
 	"github.com/go-redis/redis/v8"
 	"github.com/sirupsen/logrus"
@@ -16,13 +17,14 @@ func InitRedisDB() {
 }
 
 func getRedisDb(connection string) *redis.Client {
-	host := viper.GetString("redis." + connection + ".host")
-	port := viper.GetInt("redis." + connection + ".port")
-	database := viper.GetInt("redis." + connection + ".database")
-	password := viper.GetString("redis." + connection + ".password")
+	connection = strings.ToUpper(connection)
+	host := viper.GetString("Redis." + connection + ".Host")
+	port := viper.GetInt("Redis." + connection + ".Port")
+	database := viper.GetInt("Redis." + connection + ".Database")
+	password := viper.GetString("Redis." + connection + ".Password")
 
 	rdb := redis.NewClient(&redis.Options{
-		Addr:     host + ":" + strconv.Itoa(port),
+		Addr:     fmt.Sprintf("%s:%d", host, port),
 		Password: password,
 		DB:       database,
 	})
