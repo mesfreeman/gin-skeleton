@@ -13,7 +13,7 @@ import (
 func Test(c *gin.Context) {
 	// 开发者可以在这里加上自己的任意的测试代码，但是测试代码不应提交到仓库中！
 
-	var result = struct {
+	result := struct {
 		Mode        string `json:"mode"`
 		Welcome     string `json:"welcome"`
 		ClientIp    string `json:"clientIp"`
