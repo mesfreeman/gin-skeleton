@@ -1,6 +1,6 @@
 # 服务相关配置
 Server:
-  Name: "jarvis-backend"       # 应用名称
+  Name: "gin-skeleton"         # 应用名称
   Mode: "development"          # 模式：development, test, production
   Port: 8888                   # 端口号
 
