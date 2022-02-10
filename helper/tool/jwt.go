@@ -13,9 +13,9 @@ import (
 var signKey = viper.GetString("JwtToken.SignKey")
 
 // GenerateJwtToken 生成 Token
-func GenerateJwtToken(ID int, hour int) (string, error) {
+func GenerateJwtToken(id int, hour int) (string, error) {
 	token, err := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"id":  ID,
+		"id":  id,
 		"iat": time.Now().Unix(),
 		"exp": time.Now().Add(time.Hour * time.Duration(hour)).Unix(),
 	}).SignedString([]byte(signKey))
