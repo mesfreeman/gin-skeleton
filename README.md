@@ -53,6 +53,7 @@ cp -R config release
 cd release && ln -s ../storage storage
 
 # 修改权限
+sudo chmod +x gin-skeleton gin-cli
 sudo chown -R www-data:www-data storage
 
 # 使用PM2启动主程序
