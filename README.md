@@ -13,6 +13,7 @@
 * 支持 `GORM` 查询
 * 支持 `Redis` 查询
 * 支持 `jwt`、`sign` 中间件
+* 支持 `cobra cli` 命令行脚本
 
 ## 部署说明
 
@@ -23,7 +24,8 @@
 set CGO_ENABLED=0
 set GOOS=linux
 set GOARCH=amd64
-go build -o release
+go build -o release/gin-skeleton main.go
+go build -o release/gin-cli cmd/main.go
 
 # 拷贝配置
 cp -R config release
@@ -39,7 +41,9 @@ sudo chown -R www-data:www-data storage
 
 ```sh
 # 编译
-CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o release
+CGO_ENABLED=0 GOOS=linux GOARCH=amd64 
+go build -o release/gin-skeleton main.go
+go build -o release/gin-cli cmd/main.go
 
 # 拷贝配置
 cp -R config release
