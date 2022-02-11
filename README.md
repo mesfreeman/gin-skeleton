@@ -17,34 +17,35 @@
 
 ## 部署说明
 
-### WIN 环境下
+### 编译
 
-```sh
-# 编译
+#### WIN 环境下
+
+```shell
+# 设置环境变量
 set CGO_ENABLED=0
 set GOOS=linux
 set GOARCH=amd64
+
+# 编译主程序与命令行脚本
 go build -o release/gin-skeleton main.go
 go build -o release/gin-cli cmd/main.go
-
-# 拷贝配置
-cp -R config release
-
-# 建立日志软链
-cd release && ln -s ../storage storage
-
-# 修改权限
-sudo chown -R www-data:www-data storage
 ```
 
-### MAC 环境下
+#### MAC 环境下
 
-```sh
-# 编译
+```shell
+# 设置环境变量
 CGO_ENABLED=0 GOOS=linux GOARCH=amd64 
+
+# 编译主程序与命令行脚本
 go build -o release/gin-skeleton main.go
 go build -o release/gin-cli cmd/main.go
+```
 
+### 部署
+
+```shell
 # 拷贝配置
 cp -R config release
 
@@ -53,4 +54,7 @@ cd release && ln -s ../storage storage
 
 # 修改权限
 sudo chown -R www-data:www-data storage
+
+# 使用PM2启动主程序
+cd .. && pm2 start pm2.json
 ```
