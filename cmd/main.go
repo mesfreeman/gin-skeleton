@@ -1,7 +1,7 @@
 package main
 
-import "gin-skeleton/cmd/command"
+import "gin-skeleton/cmd/console"
 
 func main() {
-	command.Execute()
+	console.Execute()
 }

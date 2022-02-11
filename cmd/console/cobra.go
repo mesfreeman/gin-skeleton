@@ -1,4 +1,4 @@
-package command
+package console
 
 import (
 	"github.com/spf13/cobra"
