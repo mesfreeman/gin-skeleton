@@ -3,10 +3,10 @@ package provider
 import (
 	"fmt"
 	"gin-skeleton/helper"
+	"log"
 	"strings"
 
 	"github.com/go-redis/redis/v8"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )
 
@@ -30,7 +30,7 @@ func getRedisDb(connection string) *redis.Client {
 	})
 
 	if err := rdb.Ping(rdb.Context()).Err(); err != nil {
-		helper.GetLogger("").WithFields(logrus.Fields{"connection": connection, "err": err}).Fatalln("Redis start err")
+		log.Println("Redis start err: ", err, connection)
 		return nil
 	}
 	return rdb

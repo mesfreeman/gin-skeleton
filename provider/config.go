@@ -21,6 +21,6 @@ func InitConfig() {
 	// 监听配置文件
 	viper.WatchConfig()
 	viper.OnConfigChange(func(e fsnotify.Event) {
-		log.Printf("Config file changed：%s", e.Name)
+		log.Println("Config file changed: ", e.Name)
 	})
 }

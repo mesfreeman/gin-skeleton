@@ -3,10 +3,10 @@ package provider
 import (
 	"fmt"
 	"gin-skeleton/helper"
+	"log"
 	"strings"
 	"time"
 
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -42,7 +42,7 @@ func gormMysql(connection string) *gorm.DB {
 	// 打开链接
 	db, err := gorm.Open(mysql.New(mysqlConfig))
 	if err != nil {
-		helper.GetLogger("").WithFields(logrus.Fields{"connection": connection, "err": err}).Fatalln("Gorm mysql start err")
+		log.Println("Gorm mysql start err: ", err, connection)
 		return nil
 	}
 
