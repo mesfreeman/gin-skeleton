@@ -17,37 +17,29 @@
 
 ## 部署说明
 
-### 编译
-
-#### WIN 环境下
+### 本地开发
 
 ```shell
-# 设置环境变量
-set CGO_ENABLED=0
-set GOOS=linux
-set GOARCH=amd64
-
-# 编译主程序与命令行脚本
-go build -o release/gin-skeleton main.go
-go build -o release/gin-cli cmd/main.go
+make run
 ```
 
-#### MAC 环境下
+### 线上部署
 
 ```shell
-# 设置环境变量
-CGO_ENABLED=0 GOOS=linux GOARCH=amd64 
+# 编译并发布代码
+make publish
 
-# 编译主程序与命令行脚本
-go build -o release/gin-skeleton main.go
-go build -o release/gin-cli cmd/main.go
-```
+# 前往服务器
+...
 
-### 部署
+# 拉取仓库代码
+...
 
-```shell
 # 拷贝配置
 cp -R config release
+
+# 修改配置数据
+...
 
 # 建立日志软链
 cd release && ln -s ../storage storage
@@ -58,4 +50,20 @@ sudo chown -R www-data:www-data storage
 
 # 使用PM2启动主程序
 cd .. && pm2 start pm2.json
+```
+
+### 持续集成
+
+```shell
+# 编译并发布代码
+make publish
+
+# 前往服务器
+...
+
+# 拉取仓库代码
+...
+
+# 服务重启
+PM2 会监听二进制文件并自动重启服务
 ```
