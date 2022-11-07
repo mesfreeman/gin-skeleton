@@ -12,5 +12,6 @@ func InitTestRouter(Router *gin.RouterGroup) {
 	{
 		TestRouter.GET("/test", controller.Test)
 		TestRouter.POST("/test", controller.Test)
+		TestRouter.POST("/test1", controller.Test)
 	}
 }
