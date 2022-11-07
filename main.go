@@ -17,8 +17,8 @@ import (
 func main() {
 	// 初始化配置
 	provider.InitConfig()
-	provider.InitGormDB()
-	provider.InitRedisDB()
+	// provider.InitGormDB()
+	// provider.InitRedisDB()
 
 	// 服务配置
 	router := provider.Routers()
