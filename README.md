@@ -3,6 +3,8 @@
 一个基于 [GIN](https://github.com/gin-gonic/gin) 框架封装的 WEB 项目骨架，旨在快速开启 WEB 相关的项目开发。
 
 > Go版本依赖最好 >= 1.18.0，为了更好的支持 go mod 包管理及泛型操作。
+> 
+> 该项目为后端项目，配合前端项目 [vben-skeleton](https://github.com/mesfreeman/vben-skeleton) 项目，直接拥有一个完整的管理后台。
 
 ## 基础功能
 
