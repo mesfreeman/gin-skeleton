@@ -2,10 +2,13 @@ package middleware
 
 import (
 	"fmt"
-	"gin-skeleton/helper"
-	"gin-skeleton/helper/response"
 	"math"
 	"time"
+
+	"gin-skeleton/helper"
+	"gin-skeleton/helper/encrypt"
+	"gin-skeleton/helper/log"
+	"gin-skeleton/helper/response"
 
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
@@ -27,7 +30,7 @@ func SignAuth() gin.HandlerFunc {
 			Nonce     string `form:"nonce" json:"nonce" uri:"nonce"`
 		}
 
-		logger := helper.GetLogger("sign").WithFields(logrus.Fields{"params": c.Request.Form})
+		logger := log.GetLogger("sign").WithFields(logrus.Fields{"params": c.Request.Form})
 		if err := c.ShouldBind(&params); err != nil {
 			response.InvalidArgumentJSON("签名参数格式错误", c)
 			c.Abort()
@@ -46,13 +49,13 @@ func SignAuth() gin.HandlerFunc {
 		redisKey := fmt.Sprintf("signAuthNonce:%d:%s", params.AccessKey, params.Nonce)
 		if helper.RedisDefaultDb.Exists(helper.RedisDefaultDb.Context(), redisKey).Val() > 0 {
 			logger.Warnln("重复请求")
-			response.InvalidAuthJSON("重复请求", c)
+			response.UnauthorizedJSON("重复请求", c)
 			c.Abort()
 			return
 		}
 		if math.Abs(float64(time.Now().Unix()-int64(params.Timestamp))) > restMaxTime {
 			logger.Warnln("签名已过期")
-			response.InvalidAuthJSON("签名已过期", c)
+			response.UnauthorizedJSON("签名已过期", c)
 			c.Abort()
 			return
 		}
@@ -60,21 +63,22 @@ func SignAuth() gin.HandlerFunc {
 		secretKey := viper.GetString(fmt.Sprintf("SignToken.%d", params.AccessKey))
 		if secretKey == "" {
 			logger.Warnln("密钥不存在")
-			response.InvalidAuthJSON("密钥不存在", c)
+			response.UnauthorizedJSON("密钥不存在", c)
 			c.Abort()
 			return
 		}
 
 		// 签名校验
-		localSignature := helper.GetMD5(fmt.Sprintf("accessKey=%d&secretKey=%s&timestamp=%d&nonce=%s", params.AccessKey, secretKey, params.Timestamp, params.Nonce))
+		localSignature := encrypt.GetMD5(fmt.Sprintf("accessKey=%d&secretKey=%s&timestamp=%d&nonce=%s", params.AccessKey, secretKey, params.Timestamp, params.Nonce))
 		if params.Signature != localSignature {
 			logger.Warnln("签名验证失败", params.Signature, localSignature)
-			response.InvalidAuthJSON("签名验证失败", c)
+			response.UnauthorizedJSON("签名验证失败", c)
 			c.Abort()
 			return
 		}
 
 		helper.RedisDefaultDb.SetEX(helper.RedisDefaultDb.Context(), redisKey, 1, restMaxTime*time.Second)
 		c.Next()
+		return
 	}
 }

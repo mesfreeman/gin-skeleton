@@ -2,14 +2,15 @@ package provider
 
 import (
 	"fmt"
-	"gin-skeleton/helper"
-	"log"
 	"strings"
 	"time"
+
+	"gin-skeleton/helper"
 
 	"github.com/spf13/viper"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
 // InitGormDB GormDB初始化
@@ -39,10 +40,20 @@ func gormMysql(connection string) *gorm.DB {
 		SkipInitializeWithVersion: false, // 根据版本自动配置
 	}
 
+	// Gorm相关配置
+	gormConfig := &gorm.Config{
+		SkipDefaultTransaction: true, // 禁用默认的事务
+	}
+
+	// 开发环境，打印执行的SQL语句
+	if helper.IsDevelopmentEnv() {
+		gormConfig.Logger = logger.Default.LogMode(logger.Info)
+	}
+
 	// 打开链接
-	db, err := gorm.Open(mysql.New(mysqlConfig))
+	db, err := gorm.Open(mysql.New(mysqlConfig), gormConfig)
 	if err != nil {
-		log.Println("Gorm mysql start err: ", err, connection)
+		fmt.Println("Gorm mysql start err: ", err, connection)
 		return nil
 	}
 

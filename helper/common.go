@@ -1,115 +1,15 @@
 package helper
 
 import (
-	"crypto/md5"
-	"encoding/hex"
 	"fmt"
-	"log"
 	"math/rand"
 	"os"
-	"path"
 	"path/filepath"
-	"sync"
-	"time"
+	"strings"
+	"unicode"
 
-	rotatelogs "github.com/lestrrat-go/file-rotatelogs"
-	"github.com/rifflock/lfshook"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )
-
-// 日志对象集合
-var loggerMap sync.Map
-
-// GetLogger 获取日志对象
-func GetLogger(fileName string) *logrus.Logger {
-	if fileName == "" {
-		fileName = viper.GetString("Server.Name")
-	}
-
-	// 日志配置
-	logLevel := viper.GetString("Logs.Level")
-	logOutFormat := viper.GetString("Logs.OutFormat")
-	logOutPath := viper.GetString("Logs.OutPath")
-	logMaxSaveDay := viper.GetInt("Logs.MaxSaveDay")
-
-	// 如果存在，直接返回
-	key := fmt.Sprintf("%s_%s_%s_%s_%d", fileName, logLevel, logOutFormat, logOutPath, logMaxSaveDay)
-	if logger, ok := loggerMap.Load(key); ok {
-		return logger.(*logrus.Logger)
-	}
-
-	// 创建日志对象
-	logger := logrus.New()
-
-	// 设置日志输出格式：json, text
-	switch logOutFormat {
-	case "json":
-		logger.SetFormatter(&logrus.JSONFormatter{})
-	default:
-		logger.SetFormatter(&logrus.TextFormatter{})
-	}
-
-	// 设置日志等级：debug, info, error, warn, panic, fatal
-	switch logLevel {
-	case "info":
-		logger.SetLevel(logrus.InfoLevel)
-	case "error":
-		logger.SetLevel(logrus.ErrorLevel)
-	case "warn":
-		logger.SetLevel(logrus.WarnLevel)
-	case "panic":
-		logger.SetLevel(logrus.PanicLevel)
-	case "fatal":
-		logger.SetLevel(logrus.FatalLevel)
-	default:
-		logger.SetLevel(logrus.DebugLevel)
-		logger.SetReportCaller(true) // 记录文件名和行号
-	}
-
-	// 设置日志输出路径：console, file
-	switch logOutPath {
-	case "file":
-		// 日志打印到指定的目录
-		logFileName := path.Join(GetRootPath(), "storage", "logs", fileName+".log")
-		logOut, err := os.OpenFile(logFileName, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0664)
-		if err != nil {
-			log.Fatal("Open log file fail: ", err)
-		}
-		logger.SetOutput(logOut)
-
-		// 创建日志输出对象
-		var logMaxSaveDay = time.Duration(logMaxSaveDay)
-		logWriter, err := rotatelogs.New(
-			logFileName+".%Y-%m-%d.log",                              // 日志切割名称
-			rotatelogs.WithLinkName(logFileName),                     // 生成软链，指向最新日志文件
-			rotatelogs.WithMaxAge(logMaxSaveDay*24*time.Hour),        // 文件最大保存时间
-			rotatelogs.WithRotationTime(time.Duration(24)*time.Hour), // 日志切割时间间隔
-		)
-		if err != nil {
-			log.Fatal("Create rotatelogs object fail: ", err)
-		}
-
-		// 为不同级别设置不同的输出目的
-		writeMap := lfshook.WriterMap{
-			logrus.InfoLevel:  logWriter,
-			logrus.FatalLevel: logWriter,
-			logrus.DebugLevel: logWriter,
-			logrus.WarnLevel:  logWriter,
-			logrus.ErrorLevel: logWriter,
-			logrus.PanicLevel: logWriter,
-		}
-
-		// 创建logrus的本地文件系统钩子
-		lfHook := lfshook.NewHook(writeMap, &logrus.JSONFormatter{})
-		logger.AddHook(lfHook)
-	default:
-		logger.SetOutput(os.Stdout)
-	}
-
-	loggerMap.Store(key, logger)
-	return logger
-}
 
 // GetRootPath 获取项目根目录
 func GetRootPath() string {
@@ -120,16 +20,76 @@ func GetRootPath() string {
 	return rootPath
 }
 
-// GetMD5 MD5加密
-func GetMD5(str string) string {
-	md5Ctx := md5.New()
-	md5Ctx.Write([]byte(str))
-	return hex.EncodeToString(md5Ctx.Sum(nil))
-}
-
 // GetRandomString 返回指定长度的随机字符串
 func GetRandomString(n int) string {
 	randBytes := make([]byte, n/2)
 	rand.Read(randBytes)
 	return fmt.Sprintf("%x", randBytes)
+}
+
+// SubStr 截取指定长度的字段串
+func SubStr(str string, num int) string {
+	tmp := []rune(str)
+	if len(tmp) > num {
+		return string(tmp[:num])
+	}
+	return string(tmp)
+}
+
+// Calmel2Case 大小驼峰转下划线格式
+func Calmel2Case(str string) string {
+	bts := make([]byte, 0)
+	for idx, val := range str {
+		if unicode.IsUpper(val) && idx != 0 {
+			bts = append(bts, '_')
+		}
+		bts = append(bts, byte(unicode.ToLower(val)))
+	}
+	return string(bts)
+}
+
+// InSilce 检查切片中是否存在值
+func InSilce[T comparable](needle T, haystack []T) bool {
+	for _, item := range haystack {
+		if item == needle {
+			return true
+		}
+	}
+	return false
+}
+
+// DiffSilce 比较切片中差异的元素
+func DiffSilce[T comparable](targetObj []T, compareObj []T) []T {
+	var res []T
+	for _, to := range targetObj {
+		if !InSilce(to, compareObj) {
+			res = append(res, to)
+		}
+	}
+	return res
+}
+
+// IsDevelopmentEnv 检查是否为开发环境
+func IsDevelopmentEnv() bool {
+	return viper.GetString("Server.Mode") == "development"
+}
+
+// IsTestEnv 检查是否为测试环境
+func IsTestEnv() bool {
+	return viper.GetString("Server.Mode") == "test"
+}
+
+// IsProductEnv 检查是否为线上环境
+func IsProductEnv() bool {
+	return viper.GetString("Server.Mode") == "production"
+}
+
+// IsLegalUrl 检查是否为合法的网址(暂时简单判断一下)
+func IsLegalUrl(url string) bool {
+	return strings.HasPrefix(url, "http://") || strings.HasPrefix(url, "https://")
+}
+
+// IsSuperAccount 检查是否为超级账号
+func IsSuperAccount(username string) bool {
+	return viper.GetString("Server.SuperAccount") == username
 }

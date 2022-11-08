@@ -20,9 +20,9 @@ func Test(c *gin.Context) {
 		CurrentTime string `json:"currentTime"`
 	}{
 		Mode:        viper.GetString("Server.Mode"),
-		Welcome:     "hello world!!",
+		Welcome:     "hello world!",
 		ClientIp:    c.ClientIP(),
-		CurrentTime: time.Now().Format(helper.TimeFormatYmdhis),
+		CurrentTime: time.Now().Format(helper.ToDateTimeString),
 	}
-	response.SuccessJSON(result, "success", c)
+	response.SuccessJSON(result, "", c)
 }

@@ -2,6 +2,8 @@
 Server:
   Name: "gin-skeleton"         # 应用名称
   Mode: "development"          # 模式：development, test, production
+  SuperAccount: "admin"        # 超级账号，用于系统初始化配置，拥有系统所有功能权限
+  PwdSalt: "gin123"            # 密码盐
   Port: 10086                  # 端口号
 
 # 日志相关配置

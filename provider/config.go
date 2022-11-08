@@ -1,7 +1,7 @@
 package provider
 
 import (
-	"log"
+	"fmt"
 
 	"github.com/fsnotify/fsnotify"
 	"github.com/spf13/viper"
@@ -15,12 +15,12 @@ func InitConfig() {
 
 	// 读取配置文件
 	if err := viper.ReadInConfig(); err != nil {
-		log.Fatal("Read config failed: ", err)
+		panic("Read config failed: " + err.Error())
 	}
 
 	// 监听配置文件
 	viper.WatchConfig()
 	viper.OnConfigChange(func(e fsnotify.Event) {
-		log.Println("Config file changed: ", e.Name)
+		fmt.Println("Config file changed: ", e.Name)
 	})
 }
