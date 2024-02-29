@@ -2,12 +2,14 @@ package main
 
 import (
 	"context"
+	"errors"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
 
+	"gin-skeleton/helper"
 	"gin-skeleton/helper/log"
 	"gin-skeleton/helper/validator"
 	"gin-skeleton/provider"
@@ -33,7 +35,8 @@ func main() {
 	}
 
 	go func() {
-		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+		helper.StartTime = time.Now().Format(helper.ToDateTimeString) // 记录服务启动时间
+		if err := server.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
 			panic("Listen server error: " + err.Error())
 		}
 	}()
