@@ -2,6 +2,7 @@ package provider
 
 import (
 	"gin-skeleton/helper"
+	"gin-skeleton/middleware"
 	"gin-skeleton/router"
 	"gin-skeleton/router/admin"
 
@@ -16,6 +17,7 @@ func Routers() *gin.Engine {
 	}
 
 	var Router = gin.Default()
+	Router.Use(middleware.AllowCross())
 
 	// 公共路由
 	PublicGroup := Router.Group("/")
