@@ -46,6 +46,6 @@ func (ll *LoginLog) GetLoginLogList(name, ip string, operType int, createdDate [
 	}
 
 	pr = &model.BasePageResult[LoginLog]{Items: make([]*LoginLog, 0), Total: 0}
-	err = loginLogModel.Scopes(model.Paginate(pageInfo)).Find(&pr.Items).Scopes(model.Count).Count(&pr.Total).Error
+	err = loginLogModel.Scopes(model.Paginate(pageInfo)).Find(&pr.Items).Scopes(model.CancelPaginate).Count(&pr.Total).Error
 	return
 }

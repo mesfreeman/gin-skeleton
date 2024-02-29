@@ -83,8 +83,8 @@ func OrderBy(oderByInfo BaseOrderByParams) func(db *gorm.DB) *gorm.DB {
 	}
 }
 
-// Count 总条数
-func Count(db *gorm.DB) *gorm.DB {
+// CancelPaginate 取消分页
+func CancelPaginate(db *gorm.DB) *gorm.DB {
 	return db.Offset(-1).Limit(-1)
 }
 

@@ -56,7 +56,7 @@ func (f *File) GetFileList(keyword, uploader string, createdDate []string, pageI
 	}
 
 	pr = &model.BasePageResult[File]{Items: make([]*File, 0), Total: 0}
-	err = fileModel.Scopes(model.Paginate(pageInfo)).Find(&pr.Items).Scopes(model.Count).Count(&pr.Total).Error
+	err = fileModel.Scopes(model.Paginate(pageInfo)).Find(&pr.Items).Scopes(model.CancelPaginate).Count(&pr.Total).Error
 	return
 }
 

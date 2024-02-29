@@ -42,6 +42,6 @@ func (ll *OperateLog) GetOperateLogList(name, function string, createdDate []str
 	}
 
 	pr = &model.BasePageResult[OperateLog]{Items: make([]*OperateLog, 0), Total: 0}
-	err = loginLogModel.Scopes(model.Paginate(pageInfo)).Find(&pr.Items).Scopes(model.Count).Count(&pr.Total).Error
+	err = loginLogModel.Scopes(model.Paginate(pageInfo)).Find(&pr.Items).Scopes(model.CancelPaginate).Count(&pr.Total).Error
 	return
 }

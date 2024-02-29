@@ -58,7 +58,7 @@ func (a *Account) GetAccountList(name string, status int, pageInfo model.BasePag
 	}
 
 	pr = &model.BasePageResult[Account]{Items: make([]*Account, 0), Total: 0}
-	err = accountModel.Scopes(model.Paginate(pageInfo)).Find(&pr.Items).Scopes(model.Count).Count(&pr.Total).Error
+	err = accountModel.Scopes(model.Paginate(pageInfo)).Find(&pr.Items).Scopes(model.CancelPaginate).Count(&pr.Total).Error
 	if err != nil || len(pr.Items) == 0 {
 		return
 	}
