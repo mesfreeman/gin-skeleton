@@ -4,19 +4,12 @@
         "cwd": "./release",
         "script": "./gin-skeleton",
         "args": "",
+        "user": "www-data",
         "exec_mode": "fork",
-        "watch": true,
-        "ignore_watch": [
-            "config",
-            "storage",
-            ".gitignore"
-        ],
-        "watch_options": {
-            "usePolling": true
-        },
+        "watch": false,
         "min_uptime": "60s",
         "max_memory_restart": "512M",
-        "max_restarts": 5,
+        "max_restarts": 2,
         "error_file": "./storage/logs/pm2-error.log",
         "out_file": "./storage/logs/pm2-out.log"
     }
