@@ -7,8 +7,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// InintSystemRouter 初始化系统管理相关路由
-func InintSystemRouter(Router *gin.RouterGroup) {
+// InitSystemRouter 初始化系统管理相关路由
+func InitSystemRouter(Router *gin.RouterGroup) {
 	SystemRouter := Router.Group("/system").Use(middleware.TokenAuth()).Use(middleware.PermAuth()).Use(middleware.OperateLog())
 	{
 		// 账号管理

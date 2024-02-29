@@ -7,8 +7,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// InintCommonRouter 初始化公共功能相关路由
-func InintCommonRouter(Router *gin.RouterGroup) {
+// InitCommonRouter 初始化公共功能相关路由
+func InitCommonRouter(Router *gin.RouterGroup) {
 	// 登录登出
 	Router.POST("/login/login", admin.Login)
 	Router.Use(middleware.TokenAuth()).POST("/login/logout", admin.Logout)

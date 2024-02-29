@@ -26,8 +26,8 @@ func Routers() *gin.Engine {
 	// 后台路由
 	AdminGroup := Router.Group("/admin")
 	{
-		admin.InintCommonRouter(AdminGroup)
-		admin.InintSystemRouter(AdminGroup)
+		admin.InitCommonRouter(AdminGroup)
+		admin.InitSystemRouter(AdminGroup)
 	}
 
 	return Router
