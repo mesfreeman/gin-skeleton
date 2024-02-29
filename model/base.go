@@ -11,6 +11,11 @@ import (
 	"gorm.io/gorm"
 )
 
+const (
+	StatusDisable = iota + 1 // 禁用
+	StatusEnable             // 启用
+)
+
 // LocalTime 自定义时间格式
 type LocalTime time.Time
 
@@ -48,6 +53,16 @@ type BasePageParams struct {
 type BasePageResult[T any] struct {
 	Items []*T  `json:"items"`
 	Total int64 `json:"total"`
+}
+
+// FilterByDate 基于日期过滤
+func FilterByDate(dates []string, field string) func(db *gorm.DB) *gorm.DB {
+	return func(db *gorm.DB) *gorm.DB {
+		if len(dates) != 2 || dates[0] == "" || dates[1] == "" {
+			return db
+		}
+		return db.Where(fmt.Sprintf("%s between ? and ?", field), dates[0]+" 00:00:00", dates[1]+" 23:59:59")
+	}
 }
 
 // Paginate 分页数据
