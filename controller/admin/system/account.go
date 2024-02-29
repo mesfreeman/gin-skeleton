@@ -151,12 +151,12 @@ func AccountModify(c *gin.Context) {
 		}
 
 		// 添加新增角色
-		if err := system.NewAuthRelation().CreateRids(tx, account.ID, helper.DiffSilce(params.Rids, account.Rids)); err != nil {
+		if err := system.NewAuthRelation().CreateRids(tx, account.ID, helper.DiffSlice(params.Rids, account.Rids)); err != nil {
 			return err
 		}
 
 		// 删除弃用角色
-		if err := system.NewAuthRelation().DeleteRids(tx, account.ID, helper.DiffSilce(account.Rids, params.Rids)); err != nil {
+		if err := system.NewAuthRelation().DeleteRids(tx, account.ID, helper.DiffSlice(account.Rids, params.Rids)); err != nil {
 			return err
 		}
 

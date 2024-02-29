@@ -116,11 +116,11 @@ func (a *Account) EncryptPassword(password string) string {
 
 // HasPermission 判断指定账号是否授权某个权限
 func (a *Account) HasPermission(aid int64, username string, path string) (has bool, err error) {
-	myPers, err := NewMenu().GetMyPerms(aid, username)
+	myPerms, err := NewMenu().GetMyPerms(aid, username)
 	if err != nil {
 		return
 	}
 
-	has = helper.InSilce(path, myPers)
+	has = helper.InSlice(path, myPerms)
 	return
 }

@@ -138,12 +138,12 @@ func RoleModify(c *gin.Context) {
 		}
 
 		// 添加新增权限
-		if err := system.NewAuthRelation().CreateMids(tx, role.ID, helper.DiffSilce(params.Mids, role.Mids)); err != nil {
+		if err := system.NewAuthRelation().CreateMids(tx, role.ID, helper.DiffSlice(params.Mids, role.Mids)); err != nil {
 			return err
 		}
 
 		// 删除弃用权限
-		if err := system.NewAuthRelation().DeleteMids(tx, role.ID, helper.DiffSilce(role.Mids, params.Mids)); err != nil {
+		if err := system.NewAuthRelation().DeleteMids(tx, role.ID, helper.DiffSlice(role.Mids, params.Mids)); err != nil {
 			return err
 		}
 

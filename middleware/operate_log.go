@@ -34,7 +34,7 @@ func OperateLog() gin.HandlerFunc {
 		params, remark := getParams(c)
 
 		// 判断该操作是否忽略记录
-		if helper.InSilce(path, blackPaths) {
+		if helper.InSlice(path, blackPaths) {
 			c.Next()
 			return
 		}

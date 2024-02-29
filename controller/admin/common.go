@@ -253,7 +253,7 @@ func UploadFile(c *gin.Context) {
 
 	// 判断文件类型是否支持
 	fileType := strings.TrimPrefix(path.Ext(file.Filename), ".")
-	if !helper.InSilce(fileType, fileConfig.AllowTypes) {
+	if !helper.InSlice(fileType, fileConfig.AllowTypes) {
 		response.InvalidArgumentJSON(fmt.Sprintf("文件类型暂不支持[%s]", fileType), c)
 		return
 	}
