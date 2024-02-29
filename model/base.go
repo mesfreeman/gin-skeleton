@@ -68,11 +68,6 @@ func Paginate(pageInfo BasePageParams) func(db *gorm.DB) *gorm.DB {
 	}
 }
 
-// Count 总条数
-func Count(db *gorm.DB) *gorm.DB {
-	return db.Offset(-1).Limit(-1)
-}
-
 // OrderBy 排序处理
 func OrderBy(oderByInfo BaseOrderByParams) func(db *gorm.DB) *gorm.DB {
 	return func(db *gorm.DB) *gorm.DB {
@@ -82,10 +77,15 @@ func OrderBy(oderByInfo BaseOrderByParams) func(db *gorm.DB) *gorm.DB {
 
 		// 将排序字段由小驼峰转化为下划线格式
 		// 将排序参数尾部的end字符去掉，因为前端传过来的排序字段为"ascend"、"descend"
-		field := helper.Calmel2Case(oderByInfo.Field)
+		field := helper.Camel2Case(oderByInfo.Field)
 		order := strings.TrimRight(oderByInfo.Order, "end")
 		return db.Order(fmt.Sprintf("%s %s", field, order))
 	}
+}
+
+// Count 总条数
+func Count(db *gorm.DB) *gorm.DB {
+	return db.Offset(-1).Limit(-1)
 }
 
 // Scan 重写查询方法

@@ -36,8 +36,8 @@ func SubStr(str string, num int) string {
 	return string(tmp)
 }
 
-// Calmel2Case 大小驼峰转下划线格式
-func Calmel2Case(str string) string {
+// Camel2Case 大小驼峰转下划线格式
+func Camel2Case(str string) string {
 	bts := make([]byte, 0)
 	for idx, val := range str {
 		if unicode.IsUpper(val) && idx != 0 {
