@@ -33,37 +33,28 @@
 #### 1. 项目初始化
 
 ```shell
-make devinit
+go mod tidy
+cp ./config/config.yaml.example ./config/config.yaml
+chown -R www:www storage
 ```
+注：手动调整配置文件 `config.yaml` 中的相关配置。
 
 #### 2. 服务启动
 
 ```shell
-make devrun
-```
-
-#### 3. 项目编译
-
-```shell
-make buildpush
+go run main.go
 ```
 
 ### 二、线上部署
 
-#### 1. 项目初始化
+使用部署脚本 `deploy.sh`，具体使用方法如下：
 
 ```shell
-make proinit
+./deploy.sh [server] [project_path]
 ```
 
-#### 2. 服务启动
+说明：
 
-```shell
-make prostart
-```
-
-#### 3. 服务重启
-
-```shell
-make prorestart
-```
+* `server`：服务器地址，默认值：`tank.server.cn`
+* `project_path`：项目路径，默认值：`/data/services/projects/gin-skeleton/code`
+* 注：请基于实际情况调整 `deploy.sh` 中的相关配置。
