@@ -84,7 +84,7 @@ func RoleAdd(c *gin.Context) {
 		response.LogicExceptionJSON("系统出错了："+err.Error(), c)
 		return
 	}
-	response.SuccessJSON(model.BaseIdReuslt{ID: rid}, "创建角色成功", c)
+	response.SuccessJSON(model.BaseIdResult{ID: rid}, "创建角色成功", c)
 }
 
 // RoleModify 修改角色
@@ -153,7 +153,7 @@ func RoleModify(c *gin.Context) {
 		response.LogicExceptionJSON("系统出错了："+err.Error(), c)
 		return
 	}
-	response.SuccessJSON(model.BaseIdReuslt{ID: role.ID}, "修改角色成功", c)
+	response.SuccessJSON(model.BaseIdResult{ID: role.ID}, "修改角色成功", c)
 }
 
 // RoleDelete 删除角色
@@ -193,5 +193,5 @@ func RoleDelete(c *gin.Context) {
 		response.LogicExceptionJSON("系统出错了："+err.Error(), c)
 		return
 	}
-	response.SuccessJSON(model.BaseIdReuslt{ID: role.ID}, "删除角色成功", c)
+	response.SuccessJSON(model.BaseIdResult{ID: role.ID}, "删除角色成功", c)
 }

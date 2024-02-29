@@ -128,7 +128,7 @@ func MenuAdd(c *gin.Context) {
 		response.LogicExceptionJSON(err.Error(), c)
 		return
 	}
-	response.SuccessJSON(model.BaseIdReuslt{ID: newMenu.ID}, "创建菜单成功", c)
+	response.SuccessJSON(model.BaseIdResult{ID: newMenu.ID}, "创建菜单成功", c)
 }
 
 // MenuModify 修改菜单
@@ -238,7 +238,7 @@ func MenuModify(c *gin.Context) {
 		response.LogicExceptionJSON(err.Error(), c)
 		return
 	}
-	response.SuccessJSON(model.BaseIdReuslt{ID: menu.ID}, "修改菜单成功", c)
+	response.SuccessJSON(model.BaseIdResult{ID: menu.ID}, "修改菜单成功", c)
 }
 
 // MenuDelete 删除菜单
@@ -265,5 +265,5 @@ func MenuDelete(c *gin.Context) {
 		response.LogicExceptionJSON(err.Error(), c)
 		return
 	}
-	response.SuccessJSON(model.BaseIdReuslt{ID: menu.ID}, "删除菜单成功", c)
+	response.SuccessJSON(model.BaseIdResult{ID: menu.ID}, "删除菜单成功", c)
 }

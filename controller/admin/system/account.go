@@ -91,7 +91,7 @@ func AccountAdd(c *gin.Context) {
 		response.LogicExceptionJSON("系统出错了："+err.Error(), c)
 		return
 	}
-	response.SuccessJSON(model.BaseIdReuslt{ID: aid}, "创建账号成功", c)
+	response.SuccessJSON(model.BaseIdResult{ID: aid}, "创建账号成功", c)
 }
 
 // AccountModify 修改账号
@@ -166,7 +166,7 @@ func AccountModify(c *gin.Context) {
 		response.LogicExceptionJSON("系统出错了："+err.Error(), c)
 		return
 	}
-	response.SuccessJSON(model.BaseIdReuslt{ID: account.ID}, "修改账号成功", c)
+	response.SuccessJSON(model.BaseIdResult{ID: account.ID}, "修改账号成功", c)
 }
 
 // AccountModifyPwd 修改账号密码
@@ -197,7 +197,7 @@ func AccountModifyPwd(c *gin.Context) {
 		response.LogicExceptionJSON("系统出错了："+err.Error(), c)
 		return
 	}
-	response.SuccessJSON(model.BaseIdReuslt{ID: account.ID}, "修改账号密码成功", c)
+	response.SuccessJSON(model.BaseIdResult{ID: account.ID}, "修改账号密码成功", c)
 }
 
 // AccountDelete 删除账号
@@ -237,5 +237,5 @@ func AccountDelete(c *gin.Context) {
 		response.LogicExceptionJSON("系统出错了："+err.Error(), c)
 		return
 	}
-	response.SuccessJSON(model.BaseIdReuslt{ID: account.ID}, "删除账号成功", c)
+	response.SuccessJSON(model.BaseIdResult{ID: account.ID}, "删除账号成功", c)
 }

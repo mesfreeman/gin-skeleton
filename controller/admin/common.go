@@ -157,7 +157,7 @@ func ModifyMyPwd(c *gin.Context) {
 		response.LogicExceptionJSON("系统出错了："+err.Error(), c)
 		return
 	}
-	response.SuccessJSON(model.BaseIdReuslt{ID: account.ID}, "修改密码成功", c)
+	response.SuccessJSON(model.BaseIdResult{ID: account.ID}, "修改密码成功", c)
 }
 
 // ModifyMyInfo 修改我的个人信息
@@ -193,7 +193,7 @@ func ModifyMyInfo(c *gin.Context) {
 		response.LogicExceptionJSON("系统出错了："+err.Error(), c)
 		return
 	}
-	response.SuccessJSON(model.BaseIdReuslt{ID: account.ID}, "保存成功", c)
+	response.SuccessJSON(model.BaseIdResult{ID: account.ID}, "保存成功", c)
 }
 
 // LiteRoles 获取角色简单信息

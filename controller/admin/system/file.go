@@ -80,7 +80,7 @@ func FileDelete(c *gin.Context) {
 		return
 	}
 
-	response.SuccessJSON(model.BaseIdReuslt{ID: file.ID}, "删除成功", c)
+	response.SuccessJSON(model.BaseIdResult{ID: file.ID}, "删除成功", c)
 }
 
 // FileViewConfig 查看文件配置
@@ -131,5 +131,5 @@ func FileSaveConfig(c *gin.Context) {
 		return
 	}
 
-	response.SuccessJSON(model.BaseIdReuslt{ID: id}, "", c)
+	response.SuccessJSON(model.BaseIdResult{ID: id}, "", c)
 }

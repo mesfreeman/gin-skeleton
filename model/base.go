@@ -26,20 +26,20 @@ type BaseIdParams struct {
 	ID int64 `json:"id" Remark:"ID" binding:"required,gt=0"`
 }
 
-// BaseIdReuslt ID结果响应
-type BaseIdReuslt struct {
+// BaseIdResult ID结果响应
+type BaseIdResult struct {
 	ID int64 `json:"id"`
 }
 
-// BaseOrderByParmas 排序请求参数
-type BaseOrderByParmas struct {
+// BaseOrderByParams 排序请求参数
+type BaseOrderByParams struct {
 	Field string `json:"field,omitempty" remark:"排序字段"`
 	Order string `json:"order,omitempty" remark:"排序方向"`
 }
 
 // BasePageParams 分页请求参数
 type BasePageParams struct {
-	BaseOrderByParmas
+	BaseOrderByParams
 	Page     int `json:"page" remark:"页码" binding:"required,gt=0"`
 	PageSize int `json:"pageSize" remark:"条数" binding:"required,gt=0"`
 }
@@ -64,7 +64,7 @@ func Paginate(pageInfo BasePageParams) func(db *gorm.DB) *gorm.DB {
 		}
 
 		offset := (pageInfo.Page - 1) * pageInfo.PageSize
-		return db.Offset(offset).Limit(pageInfo.PageSize).Scopes(OrderBy(pageInfo.BaseOrderByParmas))
+		return db.Offset(offset).Limit(pageInfo.PageSize).Scopes(OrderBy(pageInfo.BaseOrderByParams))
 	}
 }
 
@@ -74,7 +74,7 @@ func Count(db *gorm.DB) *gorm.DB {
 }
 
 // OrderBy 排序处理
-func OrderBy(oderByInfo BaseOrderByParmas) func(db *gorm.DB) *gorm.DB {
+func OrderBy(oderByInfo BaseOrderByParams) func(db *gorm.DB) *gorm.DB {
 	return func(db *gorm.DB) *gorm.DB {
 		if oderByInfo.Field == "" || oderByInfo.Order == "" {
 			return db

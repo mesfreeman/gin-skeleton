@@ -71,5 +71,5 @@ func EmailSaveConfig(c *gin.Context) {
 		return
 	}
 
-	response.SuccessJSON(model.BaseIdReuslt{ID: id}, "", c)
+	response.SuccessJSON(model.BaseIdResult{ID: id}, "", c)
 }
