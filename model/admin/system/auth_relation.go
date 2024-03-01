@@ -7,9 +7,9 @@ import (
 	"gorm.io/gorm"
 )
 
-var (
-	AuthRelationTypA2r = 1 // 类型 - 账号角色
-	AuthRelationTypR2m = 2 // 类型 - 角色菜单
+const (
+	AuthRelationTypA2r = iota + 1 // 类型 - 账号角色
+	AuthRelationTypR2m            // 类型 - 角色菜单
 )
 
 // AuthRelation  授权关系表

@@ -6,9 +6,9 @@ import (
 )
 
 const (
-	LoginLogOperTypeSuccess = 1 // 操作类型 - 登录成功
-	LoginLogOperTypeFail    = 2 // 操作类型 - 登录失败
-	LoginLogOperTypeLogout  = 3 // 操作类型 - 退出登录
+	LoginLogTypeFail    = iota + 1 // 日志类型 - 登录失败
+	LoginLogTypeSuccess            // 日志类型 - 登录成功
+	LoginLogTypeLogout             // 日志类型 - 退出登录
 )
 
 // LoginLog 登录日志表

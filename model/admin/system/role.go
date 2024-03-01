@@ -8,11 +8,6 @@ import (
 	"gorm.io/gorm"
 )
 
-var (
-	RoleStatusOff = 1 // 状态 - 禁用
-	RoleStatusOn  = 2 // 状态 - 启用
-)
-
 // Role  角色表
 type Role struct {
 	model.BaseModel
