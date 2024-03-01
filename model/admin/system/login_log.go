@@ -20,7 +20,7 @@ type LoginLog struct {
 	Device   string `json:"device"`   // 设备型号
 	Os       string `json:"os"`       // 操作系统
 	Browser  string `json:"browser"`  // 浏览器
-	OperType int    `json:"operType"` // 操作类型：1-登录成功，2-登录失败，3-退出登录
+	Type     int    `json:"type"`     // 日志类型：1-登录失败，2-登录成功，3-退出登录
 	Remark   string `json:"remark"`   // 备注
 }
 
@@ -30,19 +30,16 @@ func NewLoginLog() *LoginLog {
 }
 
 // GetLoginLogList 获取登录日志列表
-func (ll *LoginLog) GetLoginLogList(name, ip string, operType int, createdDate []string, pageInfo model.BasePageParams) (pr *model.BasePageResult[LoginLog], err error) {
-	loginLogModel := helper.GormDefaultDb.Model(NewLoginLog())
+func (ll *LoginLog) GetLoginLogList(name, ip string, logType int, createdDate []string, pageInfo model.BasePageParams) (pr *model.BasePageResult[LoginLog], err error) {
+	loginLogModel := helper.GormDefaultDb.Model(NewLoginLog()).Scopes(model.FilterByDate(createdDate, "created_at"))
 	if name != "" {
 		loginLogModel.Where("username like ? or nickname like ?", "%"+name+"%", "%"+name+"%")
 	}
 	if ip != "" {
 		loginLogModel.Where("ip like ?", "%"+ip+"%")
 	}
-	if len(createdDate) == 2 && createdDate[0] != "" && createdDate[1] != "" {
-		loginLogModel.Where("created_at >= ? and created_at <= ?", createdDate[0]+" 00:00:00", createdDate[1]+" 23:59:59")
-	}
-	if operType > 0 {
-		loginLogModel.Where("oper_type = ?", operType)
+	if logType > 0 {
+		loginLogModel.Where("type = ?", logType)
 	}
 
 	pr = &model.BasePageResult[LoginLog]{Items: make([]*LoginLog, 0), Total: 0}
