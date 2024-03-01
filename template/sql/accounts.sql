@@ -2,7 +2,7 @@
 create table accounts
 (
     id         int(10) unsigned    not null auto_increment comment 'ID',
-    username   varchar(32)         not null default '' comment '昵称',
+    username   varchar(32)         not null default '' comment '账号',
     nickname   varchar(32)         not null default '' comment '昵称',
     password   varchar(32)         not null default '' comment '密码',
     avatar     varchar(255)        not null default '' comment '头像',
@@ -15,7 +15,7 @@ create table accounts
     updated_at datetime            not null default current_timestamp comment '更新时间',
     primary key (id),
     unique key (username),
-    key (email),
+    unique key (email),
     key (created_at),
     key (updated_at)
 ) engine = InnoDB

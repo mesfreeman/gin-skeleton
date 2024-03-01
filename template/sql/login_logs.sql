@@ -8,7 +8,7 @@ create table login_logs
     device     varchar(64)         not null default '' comment '设备型号',
     os         varchar(32)         not null default '' comment '操作系统',
     browser    varchar(32)         not null default '' comment '浏览器',
-    oper_type  tinyint(1) unsigned not null default '1' comment '操作类型：1-登录成功，2-登录失败，3-退出登录',
+    type       tinyint(1) unsigned not null default '2' comment '日志类型：1-登录失败，2-登录成功，3-退出登录',
     remark     varchar(255)        not null default '' comment '备注',
     created_at datetime            not null default current_timestamp comment '创建时间',
     updated_at datetime            not null default current_timestamp comment '更新时间',
