@@ -37,17 +37,16 @@ func MenuList(c *gin.Context) {
 // MenuAdd 添加菜单
 func MenuAdd(c *gin.Context) {
 	var params struct {
-		Pid       int64  `json:"pid" remark:"PID"`
-		Pname     any    `json:"pname" remark:"上级"`
-		Name      string `json:"name" remark:"名称" binding:"required,min=1,max=32"`
-		Icon      string `json:"icon" remark:"图标" binding:"max=128"`
-		Path      string `json:"path" remark:"地址" binding:"required,max=255"`
-		Component string `json:"component" remark:"组件" binding:"max=255"`
-		Type      int    `json:"type" remark:"类型" binding:"oneof=1 2 3"`
-		Mode      int    `json:"mode" remark:"模式" binding:"oneof=1 2 3"`
-		Weight    int    `json:"weight" remark:"排序" binding:"gte=0"`
-		IsShow    int    `json:"isShow" remark:"显示" binding:"oneof=1 2"`
-		Status    int    `json:"status" remark:"状态" binding:"oneof=1 2"`
+		Pid    int64  `json:"pid" remark:"PID"`
+		Pname  any    `json:"pname" remark:"上级"`
+		Name   string `json:"name" remark:"名称" binding:"required,min=1,max=32"`
+		Icon   string `json:"icon" remark:"图标" binding:"max=128"`
+		Path   string `json:"path" remark:"地址" binding:"required,max=255"`
+		Type   int    `json:"type" remark:"类型" binding:"oneof=1 2 3"`
+		Mode   int    `json:"mode" remark:"模式" binding:"oneof=1 2 3"`
+		Weight int    `json:"weight" remark:"排序" binding:"gte=0"`
+		IsShow int    `json:"isShow" remark:"显示" binding:"oneof=1 2"`
+		Status int    `json:"status" remark:"状态" binding:"oneof=1 2"`
 	}
 	if err := c.ShouldBindJSON(&params); err != nil {
 		response.ValidatorFailedJson(err, c)
@@ -94,17 +93,6 @@ func MenuAdd(c *gin.Context) {
 		return
 	}
 
-	// 数据处理
-	if params.Type == system.MenuTypeDir {
-		params.Component = "layout"
-	}
-	if params.Type == system.MenuTypeMenu && params.Mode != system.MenuModeComponent {
-		params.Component = "iframe"
-	}
-	if params.Type == system.MenuTypeApi {
-		params.Component = ""
-	}
-
 	// 组件地址，必须以前缀"/"开头
 	if params.Mode == system.MenuModeComponent {
 		params.Path = "/" + strings.TrimPrefix(params.Path, "/")
@@ -112,17 +100,16 @@ func MenuAdd(c *gin.Context) {
 
 	// 创建菜单
 	newMenu := system.Menu{
-		Pid:       params.Pid,
-		Name:      params.Name,
-		Icon:      params.Icon,
-		Path:      params.Path,
-		Component: params.Component,
-		Type:      params.Type,
-		Mode:      params.Mode,
-		Weight:    params.Weight,
-		Level:     level,
-		IsShow:    params.IsShow,
-		Status:    params.Status,
+		Pid:    params.Pid,
+		Name:   params.Name,
+		Icon:   params.Icon,
+		Path:   params.Path,
+		Type:   params.Type,
+		Mode:   params.Mode,
+		Weight: params.Weight,
+		Level:  level,
+		IsShow: params.IsShow,
+		Status: params.Status,
 	}
 	if err = helper.GormDefaultDb.Create(&newMenu).Error; err != nil {
 		response.LogicExceptionJSON(err.Error(), c)
@@ -135,17 +122,16 @@ func MenuAdd(c *gin.Context) {
 func MenuModify(c *gin.Context) {
 	var params struct {
 		model.BaseIdParams
-		Pid       int64  `json:"pid" remark:"PID"`
-		Pname     any    `json:"pname" remark:"上级"`
-		Name      string `json:"name" remark:"名称" binding:"required,min=1,max=32"`
-		Icon      string `json:"icon" remark:"图标" binding:"max=128"`
-		Path      string `json:"path" remark:"地址" binding:"required,max=255"`
-		Component string `json:"component" remark:"组件" binding:"max=255"`
-		Type      int    `json:"type" remark:"类型" binding:"oneof=1 2 3"`
-		Mode      int    `json:"mode" remark:"模式" binding:"oneof=1 2 3"`
-		Weight    int    `json:"weight" remark:"排序" binding:"gte=0"`
-		IsShow    int    `json:"isShow" remark:"显示" binding:"oneof=1 2"`
-		Status    int    `json:"status" remark:"状态" binding:"oneof=1 2"`
+		Pid    int64  `json:"pid" remark:"PID"`
+		Pname  any    `json:"pname" remark:"上级"`
+		Name   string `json:"name" remark:"名称" binding:"required,min=1,max=32"`
+		Icon   string `json:"icon" remark:"图标" binding:"max=128"`
+		Path   string `json:"path" remark:"地址" binding:"required,max=255"`
+		Type   int    `json:"type" remark:"类型" binding:"oneof=1 2 3"`
+		Mode   int    `json:"mode" remark:"模式" binding:"oneof=1 2 3"`
+		Weight int    `json:"weight" remark:"排序" binding:"gte=0"`
+		IsShow int    `json:"isShow" remark:"显示" binding:"oneof=1 2"`
+		Status int    `json:"status" remark:"状态" binding:"oneof=1 2"`
 	}
 	if err := c.ShouldBindJSON(&params); err != nil {
 		response.ValidatorFailedJson(err, c)
@@ -205,17 +191,6 @@ func MenuModify(c *gin.Context) {
 		}
 	}
 
-	// 数据处理
-	if params.Type == system.MenuTypeDir {
-		params.Component = "layout"
-	}
-	if params.Type == system.MenuTypeMenu && params.Mode != system.MenuModeComponent {
-		params.Component = "iframe"
-	}
-	if params.Type == system.MenuTypeApi {
-		params.Component = ""
-	}
-
 	// 组件地址，必须以前缀"/"开头
 	if params.Mode == system.MenuModeComponent {
 		params.Path = "/" + strings.TrimPrefix(params.Path, "/")
@@ -226,7 +201,6 @@ func MenuModify(c *gin.Context) {
 	menu.Name = params.Name
 	menu.Icon = params.Icon
 	menu.Path = params.Path
-	menu.Component = params.Component
 	menu.Type = params.Type
 	menu.Mode = params.Mode
 	menu.Weight = params.Weight
