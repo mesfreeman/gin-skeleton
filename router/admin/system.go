@@ -7,9 +7,9 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// InintSystemRouter 初始化系统管理相关路由
-func InintSystemRouter(Router *gin.RouterGroup) {
-	SystemRouter := Router.Group("/system").Use(middleware.TokenAuth()).Use(middleware.PermAuth()).Use(middleware.OperateLog())
+// InitSystemRouter 初始化系统管理相关路由
+func InitSystemRouter(Router *gin.RouterGroup) {
+	SystemRouter := Router.Group("/system").Use(middleware.TokenAuth(), middleware.PermAuth(), middleware.OperateLog())
 	{
 		// 账号管理
 		SystemRouter.POST("/account/list", system.AccountList)
@@ -39,6 +39,11 @@ func InintSystemRouter(Router *gin.RouterGroup) {
 		// 邮件配置
 		SystemRouter.POST("/email/viewConfig", system.EmailViewConfig)
 		SystemRouter.POST("/email/saveConfig", system.EmailSaveConfig)
+		SystemRouter.POST("/email/templateList", system.EmailTemplateList)
+		SystemRouter.POST("/email/templateAdd", system.EmailTemplateAdd)
+		SystemRouter.POST("/email/templateModify", system.EmailTemplateModify)
+		SystemRouter.POST("/email/templateDelete", system.EmailTemplateDelete)
+		SystemRouter.POST("/email/batchSend", system.EmailBatchSend)
 
 		// 登录日志
 		SystemRouter.POST("/loginLog/list", system.LoginLogList)

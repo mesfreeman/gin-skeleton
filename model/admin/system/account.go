@@ -11,11 +11,6 @@ import (
 	"gorm.io/gorm"
 )
 
-const (
-	AccountStatusDisable = 1 // 状态 - 禁用
-	AccountStatusNormal  = 2 // 状态 - 启用
-)
-
 // Account  账号表
 type Account struct {
 	model.BaseModel
@@ -33,13 +28,14 @@ type Account struct {
 
 // MyInfo 我的账号信息
 type MyInfo struct {
-	ID       int64  `json:"id"`
-	Username string `json:"username"`
-	Nickname string `json:"nickname"`
-	Email    string `json:"email"`
-	Phone    string `json:"phone"`
-	Avatar   string `json:"avatar"`
-	Status   int    `json:"-"`
+	ID       int64  `json:"id"`                // 账号ID
+	Username string `json:"username"`          // 账号
+	Nickname string `json:"nickname"`          // 昵称
+	Email    string `json:"email"`             // 邮箱
+	Phone    string `json:"phone"`             // 手机号
+	Avatar   string `json:"avatar"`            // 头像
+	HomePath string `json:"homePath" gorm:"-"` // 首页路径
+	Status   int    `json:"-"`                 // 状态：1-禁用，2-启用
 }
 
 // NewAccount 初始化账号
@@ -58,7 +54,7 @@ func (a *Account) GetAccountList(name string, status int, pageInfo model.BasePag
 	}
 
 	pr = &model.BasePageResult[Account]{Items: make([]*Account, 0), Total: 0}
-	err = accountModel.Scopes(model.Paginate(pageInfo)).Find(&pr.Items).Scopes(model.Count).Count(&pr.Total).Error
+	err = accountModel.Scopes(model.Paginate(pageInfo)).Find(&pr.Items).Scopes(model.CancelPaginate).Count(&pr.Total).Error
 	if err != nil || len(pr.Items) == 0 {
 		return
 	}
@@ -78,6 +74,13 @@ func (a *Account) GetAccountList(name string, status int, pageInfo model.BasePag
 // FindMyInfo 查找指定账号ID的个人信息
 func (a *Account) FindMyInfo(id int64) (loginInfo *MyInfo, err error) {
 	err = helper.GormDefaultDb.Model(NewAccount()).First(&loginInfo, id).Error
+	if err != nil {
+		return
+	}
+
+	// 获取首页路径
+	myMenus, _ := NewMenu().GetMyMenus(loginInfo.ID, loginInfo.Username)
+	loginInfo.HomePath, err = NewMenu().GetHomePath(myMenus)
 	return
 }
 
@@ -109,6 +112,12 @@ func (a *Account) FindByUsername(username string) (account *Account, err error) 
 	return
 }
 
+// FindByEmail 基于邮箱查找账号信息
+func (a *Account) FindByEmail(email string) (account *Account, err error) {
+	err = helper.GormDefaultDb.Where("email = ?", email).First(&account).Error
+	return
+}
+
 // EncryptPassword 加密密码
 func (a *Account) EncryptPassword(password string) string {
 	return encrypt.GetMD5(fmt.Sprintf("%s@@%s", viper.GetString("Server.PwdSalt"), password))
@@ -116,11 +125,11 @@ func (a *Account) EncryptPassword(password string) string {
 
 // HasPermission 判断指定账号是否授权某个权限
 func (a *Account) HasPermission(aid int64, username string, path string) (has bool, err error) {
-	myPers, err := NewMenu().GetMyPerms(aid, username)
+	myPerms, err := NewMenu().GetMyPerms(aid, username)
 	if err != nil {
 		return
 	}
 
-	has = helper.InSilce(path, myPers)
+	has = helper.InSlice(path, myPerms)
 	return
 }

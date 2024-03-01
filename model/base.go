@@ -11,6 +11,11 @@ import (
 	"gorm.io/gorm"
 )
 
+const (
+	StatusDisable = iota + 1 // 禁用
+	StatusEnable             // 启用
+)
+
 // LocalTime 自定义时间格式
 type LocalTime time.Time
 
@@ -26,20 +31,20 @@ type BaseIdParams struct {
 	ID int64 `json:"id" Remark:"ID" binding:"required,gt=0"`
 }
 
-// BaseIdReuslt ID结果响应
-type BaseIdReuslt struct {
+// BaseIdResult ID结果响应
+type BaseIdResult struct {
 	ID int64 `json:"id"`
 }
 
-// BaseOrderByParmas 排序请求参数
-type BaseOrderByParmas struct {
+// BaseOrderByParams 排序请求参数
+type BaseOrderByParams struct {
 	Field string `json:"field,omitempty" remark:"排序字段"`
 	Order string `json:"order,omitempty" remark:"排序方向"`
 }
 
 // BasePageParams 分页请求参数
 type BasePageParams struct {
-	BaseOrderByParmas
+	BaseOrderByParams
 	Page     int `json:"page" remark:"页码" binding:"required,gt=0"`
 	PageSize int `json:"pageSize" remark:"条数" binding:"required,gt=0"`
 }
@@ -48,6 +53,16 @@ type BasePageParams struct {
 type BasePageResult[T any] struct {
 	Items []*T  `json:"items"`
 	Total int64 `json:"total"`
+}
+
+// FilterByDate 基于日期过滤
+func FilterByDate(dates []string, field string) func(db *gorm.DB) *gorm.DB {
+	return func(db *gorm.DB) *gorm.DB {
+		if len(dates) != 2 || dates[0] == "" || dates[1] == "" {
+			return db
+		}
+		return db.Where(fmt.Sprintf("%s between ? and ?", field), dates[0]+" 00:00:00", dates[1]+" 23:59:59")
+	}
 }
 
 // Paginate 分页数据
@@ -64,17 +79,12 @@ func Paginate(pageInfo BasePageParams) func(db *gorm.DB) *gorm.DB {
 		}
 
 		offset := (pageInfo.Page - 1) * pageInfo.PageSize
-		return db.Offset(offset).Limit(pageInfo.PageSize).Scopes(OrderBy(pageInfo.BaseOrderByParmas))
+		return db.Offset(offset).Limit(pageInfo.PageSize).Scopes(OrderBy(pageInfo.BaseOrderByParams))
 	}
 }
 
-// Count 总条数
-func Count(db *gorm.DB) *gorm.DB {
-	return db.Offset(-1).Limit(-1)
-}
-
 // OrderBy 排序处理
-func OrderBy(oderByInfo BaseOrderByParmas) func(db *gorm.DB) *gorm.DB {
+func OrderBy(oderByInfo BaseOrderByParams) func(db *gorm.DB) *gorm.DB {
 	return func(db *gorm.DB) *gorm.DB {
 		if oderByInfo.Field == "" || oderByInfo.Order == "" {
 			return db
@@ -82,10 +92,15 @@ func OrderBy(oderByInfo BaseOrderByParmas) func(db *gorm.DB) *gorm.DB {
 
 		// 将排序字段由小驼峰转化为下划线格式
 		// 将排序参数尾部的end字符去掉，因为前端传过来的排序字段为"ascend"、"descend"
-		field := helper.Calmel2Case(oderByInfo.Field)
+		field := helper.Camel2Case(oderByInfo.Field)
 		order := strings.TrimRight(oderByInfo.Order, "end")
 		return db.Order(fmt.Sprintf("%s %s", field, order))
 	}
+}
+
+// CancelPaginate 取消分页
+func CancelPaginate(db *gorm.DB) *gorm.DB {
+	return db.Offset(-1).Limit(-1)
 }
 
 // Scan 重写查询方法

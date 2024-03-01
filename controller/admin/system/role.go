@@ -84,7 +84,7 @@ func RoleAdd(c *gin.Context) {
 		response.LogicExceptionJSON("系统出错了："+err.Error(), c)
 		return
 	}
-	response.SuccessJSON(model.BaseIdReuslt{ID: rid}, "创建角色成功", c)
+	response.SuccessJSON(model.BaseIdResult{ID: rid}, "创建角色成功", c)
 }
 
 // RoleModify 修改角色
@@ -138,12 +138,12 @@ func RoleModify(c *gin.Context) {
 		}
 
 		// 添加新增权限
-		if err := system.NewAuthRelation().CreateMids(tx, role.ID, helper.DiffSilce(params.Mids, role.Mids)); err != nil {
+		if err := system.NewAuthRelation().CreateMids(tx, role.ID, helper.DiffSlice(params.Mids, role.Mids)); err != nil {
 			return err
 		}
 
 		// 删除弃用权限
-		if err := system.NewAuthRelation().DeleteMids(tx, role.ID, helper.DiffSilce(role.Mids, params.Mids)); err != nil {
+		if err := system.NewAuthRelation().DeleteMids(tx, role.ID, helper.DiffSlice(role.Mids, params.Mids)); err != nil {
 			return err
 		}
 
@@ -153,7 +153,7 @@ func RoleModify(c *gin.Context) {
 		response.LogicExceptionJSON("系统出错了："+err.Error(), c)
 		return
 	}
-	response.SuccessJSON(model.BaseIdReuslt{ID: role.ID}, "修改角色成功", c)
+	response.SuccessJSON(model.BaseIdResult{ID: role.ID}, "修改角色成功", c)
 }
 
 // RoleDelete 删除角色
@@ -193,5 +193,5 @@ func RoleDelete(c *gin.Context) {
 		response.LogicExceptionJSON("系统出错了："+err.Error(), c)
 		return
 	}
-	response.SuccessJSON(model.BaseIdReuslt{ID: role.ID}, "删除角色成功", c)
+	response.SuccessJSON(model.BaseIdResult{ID: role.ID}, "删除角色成功", c)
 }

@@ -14,7 +14,7 @@ func LoginLogList(c *gin.Context) {
 		model.BasePageParams
 		Name        string   `json:"name,omitempty" remark:"账号"`
 		Ip          string   `json:"ip,omitempty" remark:"IP地址"`
-		OperType    int      `json:"operType,omitempty" remark:"操作类型" binding:"oneof=0 1 2 3"`
+		Type        int      `json:"type,omitempty" remark:"日志类型" binding:"oneof=0 1 2 3"`
 		CreatedDate []string `json:"createdDate,omitempty" remark:"创建时间"`
 	}
 	if err := c.ShouldBindJSON(&params); err != nil {
@@ -22,7 +22,7 @@ func LoginLogList(c *gin.Context) {
 		return
 	}
 
-	loginLogList, err := system.NewLoginLog().GetLoginLogList(params.Name, params.Ip, params.OperType, params.CreatedDate, params.BasePageParams)
+	loginLogList, err := system.NewLoginLog().GetLoginLogList(params.Name, params.Ip, params.Type, params.CreatedDate, params.BasePageParams)
 	if err != nil {
 		response.LogicExceptionJSON("系统出错了："+err.Error(), c)
 		return

@@ -2,7 +2,6 @@ package tool
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"io"
 	"strings"
@@ -95,9 +94,6 @@ func (s *qiniuStorage) PutFileByUrl(source string, fileName string, sourceUrl st
 func (s *qiniuStorage) DeleteFile(fileUrl string) (err error) {
 	manager := storage.NewBucketManager(qbox.NewMac(s.AccessKey, s.SecretKey), &storage.Config{})
 	err = manager.Delete(s.Bucket, strings.TrimPrefix(fileUrl, s.Domain+"/"))
-	if errors.Is(err, storage.ErrNoSuchFile) {
-		err = nil // 文件不存在时，忽略该异常(可能是配置修改导致查询不到数据的)
-	}
 	return
 }
 

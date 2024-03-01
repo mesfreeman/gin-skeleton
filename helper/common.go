@@ -36,8 +36,8 @@ func SubStr(str string, num int) string {
 	return string(tmp)
 }
 
-// Calmel2Case 大小驼峰转下划线格式
-func Calmel2Case(str string) string {
+// Camel2Case 大小驼峰转下划线格式
+func Camel2Case(str string) string {
 	bts := make([]byte, 0)
 	for idx, val := range str {
 		if unicode.IsUpper(val) && idx != 0 {
@@ -48,8 +48,8 @@ func Calmel2Case(str string) string {
 	return string(bts)
 }
 
-// InSilce 检查切片中是否存在值
-func InSilce[T comparable](needle T, haystack []T) bool {
+// InSlice 检查切片中是否存在值
+func InSlice[T comparable](needle T, haystack []T) bool {
 	for _, item := range haystack {
 		if item == needle {
 			return true
@@ -58,11 +58,11 @@ func InSilce[T comparable](needle T, haystack []T) bool {
 	return false
 }
 
-// DiffSilce 比较切片中差异的元素
-func DiffSilce[T comparable](targetObj []T, compareObj []T) []T {
+// DiffSlice 比较切片中差异的元素
+func DiffSlice[T comparable](targetObj []T, compareObj []T) []T {
 	var res []T
 	for _, to := range targetObj {
-		if !InSilce(to, compareObj) {
+		if !InSlice(to, compareObj) {
 			res = append(res, to)
 		}
 	}

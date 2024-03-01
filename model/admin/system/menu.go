@@ -7,35 +7,35 @@ import (
 )
 
 const (
-	MenuTypeDir  = 1 // 类型 - 目录
-	MenuTypeMenu = 2 // 类型 - 菜单
-	MenuTypeApi  = 3 // 类型 - 接口
+	MenuTypeDir  = iota + 1 // 类型 - 目录
+	MenuTypeMenu            // 类型 - 菜单
+	MenuTypeApi             // 类型 - 接口
+)
 
-	MenuModeComponent = 1 // 模式 - 组件
-	MenuModeInnerLink = 2 // 模式 - 内链
-	MenuModeOuterLink = 3 // 模式 - 外链
+const (
+	MenuModeComponent = iota + 1 // 模式 - 组件
+	MenuModeInnerLink            // 模式 - 内链
+	MenuModeOuterLink            // 模式 - 外链
+)
 
-	MenuIsShowNo  = 1 // 是否显示 - 否
-	MenuIsShowYes = 2 // 是否显示 - 是
-
-	MenuStatusOff = 1 // 状态 - 禁用
-	MenuStatusOn  = 2 // 状态 - 启用
+const (
+	MenuIsShowNo  = 1 // 是否显示 - 显示
+	MenuIsShowYes = 2 // 是否显示 - 隐藏
 )
 
 // Menu  菜单表
 type Menu struct {
 	model.BaseModel
-	Pid       int64  `json:"pid"`       // 父id
-	Name      string `json:"name"`      // 名称
-	Icon      string `json:"icon"`      // 图标
-	Path      string `json:"path"`      // 路径
-	Component string `json:"component"` // 组件
-	Type      int    `json:"type"`      // 类型：0-目录，1-菜单，2-按钮
-	Mode      int    `json:"mode"`      // 模式：1-组件，2-内链，3-外链
-	Weight    int    `json:"weight"`    // 权重，值越大越靠前
-	Level     int    `json:"-"`         // 等级，表示几级菜单
-	IsShow    int    `json:"isShow"`    // 是否显示：1-否，2-是
-	Status    int    `json:"status"`    // 状态：0-禁用，1-启用
+	Pid    int64  `json:"pid"`    // 父id
+	Name   string `json:"name"`   // 名称
+	Icon   string `json:"icon"`   // 图标
+	Path   string `json:"path"`   // 路径
+	Type   int    `json:"type"`   // 类型：1-目录，2-菜单，3-接口
+	Mode   int    `json:"mode"`   // 模式：1-组件，2-内链，3-外链
+	Weight int    `json:"weight"` // 权重，值越大越靠前
+	Level  int    `json:"-"`      // 等级，表示几级菜单
+	IsShow int    `json:"isShow"` // 是否显示：1-否，2-是
+	Status int    `json:"status"` // 状态：0-禁用，1-启用
 }
 
 // 我的菜单
@@ -63,7 +63,7 @@ func NewMenu() *Menu {
 
 // GetMyMenus 获取我的菜单
 func (m *Menu) GetMyMenus(aid int64, username string) (myMenus []*myMenu, err error) {
-	var myMenuData []Menu
+	myMenus = make([]*myMenu, 0)
 	var menuModel = helper.GormDefaultDb.Model(NewMenu())
 
 	// 非超级账号，只获取拥有权限的菜单
@@ -73,12 +73,12 @@ func (m *Menu) GetMyMenus(aid int64, username string) (myMenus []*myMenu, err er
 			err = err2
 			return
 		}
-
 		menuModel.Where("id in ?", mids)
 	}
 
 	// 获取菜单数据
-	err = menuModel.Where("status = ? and type in ?", MenuStatusOn, []int{MenuTypeDir, MenuTypeMenu}).
+	var myMenuData []Menu
+	err = menuModel.Where("status = ? and type in ?", model.StatusEnable, []int{MenuTypeDir, MenuTypeMenu}).
 		Order("level asc, weight desc, id asc").Find(&myMenuData).Error
 	if err != nil || len(myMenuData) == 0 {
 		return
@@ -87,6 +87,17 @@ func (m *Menu) GetMyMenus(aid int64, username string) (myMenus []*myMenu, err er
 	// 生成树结构
 	myMenus = generateMyMenusTree(myMenuData, 0)
 	return
+}
+
+// GetHomePath 获取我的首页路径
+func (m *Menu) GetHomePath(myMenus []*myMenu) (path string, err error) {
+	for _, myMenu := range myMenus {
+		if myMenu.Children == nil && len(myMenu.Children) == 0 {
+			return myMenu.Path, nil
+		}
+		return m.GetHomePath(myMenu.Children)
+	}
+	return "", err
 }
 
 // GetMyPerms 获取我的权限代码
@@ -101,17 +112,17 @@ func (m *Menu) GetMyPerms(aid int64, username string) (myPerms []string, err err
 			err = err2
 			return
 		}
-
 		menuModel.Where("id in ?", mids)
 	}
 
 	// 获取权限代码
-	err = menuModel.Where("type = ? and status = ?", MenuTypeApi, MenuStatusOn).Pluck("path", &myPerms).Error
+	err = menuModel.Where("type = ? and status = ?", MenuTypeApi, model.StatusEnable).Pluck("path", &myPerms).Error
 	return
 }
 
 // GetSysMenus 获取系统菜单
 func (m *Menu) GetSysMenus(name string, status int, typ []int) (sysMenus []*sysMenu, err error) {
+	sysMenus = make([]*sysMenu, 0)
 	menuModel := helper.GormDefaultDb.Model(NewMenu())
 	if name != "" {
 		menuModel.Where("name like ?", "%"+name+"%")
@@ -175,7 +186,17 @@ func generateMyMenusTree(menus []Menu, pid int64) (myMenus []*myMenu) {
 		// 处理内嵌网页的菜单
 		path, frameSrc := menu.Path, ""
 		if menu.Mode == MenuModeInnerLink {
-			path, frameSrc = fmt.Sprintf("iframe%d", menu.ID), menu.Path
+			path, frameSrc = fmt.Sprintf("/iframe%d", menu.ID), menu.Path
+		}
+
+		// 处理组件地址
+		component := path
+		if menu.Type == MenuTypeDir {
+			component = "layout"
+		} else if menu.Type == MenuTypeMenu && menu.Mode != MenuModeComponent {
+			component = "iframe"
+		} else if menu.Type == MenuTypeApi {
+			component = ""
 		}
 
 		// 拼接菜单数据
@@ -184,7 +205,7 @@ func generateMyMenusTree(menus []Menu, pid int64) (myMenus []*myMenu) {
 			Pid:       menu.Pid,
 			Name:      menu.Name,
 			Path:      path,
-			Component: menu.Component,
+			Component: component,
 			Meta: map[string]interface{}{
 				"title":    menu.Name,
 				"icon":     menu.Icon,
@@ -198,7 +219,7 @@ func generateMyMenusTree(menus []Menu, pid int64) (myMenus []*myMenu) {
 }
 
 // 生成系统菜单树
-func generateSysMenusTree(sysMenuData []Menu, sysMenuMap map[int64]string, pid int64) (SysMenus []*sysMenu) {
+func generateSysMenusTree(sysMenuData []Menu, sysMenuMap map[int64]string, pid int64) (sysMenus []*sysMenu) {
 	for _, menu := range sysMenuData {
 		if menu.Pid != pid {
 			continue
@@ -207,7 +228,7 @@ func generateSysMenusTree(sysMenuData []Menu, sysMenuMap map[int64]string, pid i
 		// 递归子菜单
 		pname := sysMenuMap[menu.Pid]
 		children := generateSysMenusTree(sysMenuData, sysMenuMap, menu.ID)
-		SysMenus = append(SysMenus, &sysMenu{
+		sysMenus = append(sysMenus, &sysMenu{
 			menu,
 			pname,
 			children,

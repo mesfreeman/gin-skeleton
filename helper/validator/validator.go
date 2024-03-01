@@ -1,6 +1,7 @@
 package validator
 
 import (
+	"errors"
 	"reflect"
 	"strings"
 
@@ -42,7 +43,8 @@ func InitTranslator() {
 // Translate 翻译校验器错误信息为中文
 func Translate(err error) string {
 	// 如果是校验器的错误，则只返回第一个错误信息
-	if errs, ok := err.(validator.ValidationErrors); ok {
+	var errs validator.ValidationErrors
+	if errors.As(err, &errs) {
 		for _, err := range errs.Translate(trans) {
 			return err
 		}

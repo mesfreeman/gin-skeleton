@@ -8,11 +8,6 @@ import (
 	"gorm.io/gorm"
 )
 
-var (
-	RoleStatusOff = 1 // 状态 - 禁用
-	RoleStatusOn  = 2 // 状态 - 启用
-)
-
 // Role  角色表
 type Role struct {
 	model.BaseModel
@@ -39,7 +34,7 @@ func (r *Role) GetRoleList(name string, status int, pageInfo model.BasePageParam
 	}
 
 	pr = &model.BasePageResult[Role]{Items: make([]*Role, 0), Total: 0}
-	err = roleModel.Scopes(model.Paginate(pageInfo)).Find(&pr.Items).Scopes(model.Count).Count(&pr.Total).Error
+	err = roleModel.Scopes(model.Paginate(pageInfo)).Find(&pr.Items).Scopes(model.CancelPaginate).Count(&pr.Total).Error
 	if err != nil || len(pr.Items) == 0 {
 		return
 	}

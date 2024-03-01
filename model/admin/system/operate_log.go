@@ -23,25 +23,22 @@ type OperateLog struct {
 	Remark    string `json:"remark"`    // 备注
 }
 
-// NewOerateLog 初始化对象
-func NewOerateLog() *OperateLog {
+// NewOperateLog 初始化对象
+func NewOperateLog() *OperateLog {
 	return &OperateLog{}
 }
 
 // GetOperateLogList 获取操作日志列表
 func (ll *OperateLog) GetOperateLogList(name, function string, createdDate []string, pageInfo model.BasePageParams) (pr *model.BasePageResult[OperateLog], err error) {
-	loginLogModel := helper.GormDefaultDb.Model(NewOerateLog())
+	loginLogModel := helper.GormDefaultDb.Model(NewOperateLog()).Scopes(model.FilterByDate(createdDate, "created_at"))
 	if name != "" {
 		loginLogModel.Where("username like ? or nickname like ?", "%"+name+"%", "%"+name+"%")
 	}
 	if function != "" {
 		loginLogModel.Where("function like ?", "%"+function+"%")
 	}
-	if len(createdDate) == 2 && createdDate[0] != "" && createdDate[1] != "" {
-		loginLogModel.Where("created_at >= ? and created_at <= ?", createdDate[0]+" 00:00:00", createdDate[1]+" 23:59:59")
-	}
 
 	pr = &model.BasePageResult[OperateLog]{Items: make([]*OperateLog, 0), Total: 0}
-	err = loginLogModel.Scopes(model.Paginate(pageInfo)).Find(&pr.Items).Scopes(model.Count).Count(&pr.Total).Error
+	err = loginLogModel.Scopes(model.Paginate(pageInfo)).Find(&pr.Items).Scopes(model.CancelPaginate).Count(&pr.Total).Error
 	return
 }

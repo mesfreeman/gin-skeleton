@@ -15,8 +15,8 @@ import (
 func AccountList(c *gin.Context) {
 	var params struct {
 		model.BasePageParams
-		Name   string `json:"name" remark:"账号名" binding:"max=32"`
-		Status int    `json:"status" remark:"状态" binding:"oneof=0 1 2"`
+		Name   string `json:"name" remark:"账号名"`
+		Status int    `json:"status" remark:"状态"`
 	}
 	if err := c.ShouldBindJSON(&params); err != nil {
 		response.ValidatorFailedJson(err, c)
@@ -61,6 +61,17 @@ func AccountAdd(c *gin.Context) {
 		return
 	}
 
+	// 判断邮箱是否存在
+	dbAccount, err = system.NewAccount().FindByEmail(params.Email)
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		response.LogicExceptionJSON("系统出错了："+err.Error(), c)
+		return
+	}
+	if dbAccount.ID > 0 {
+		response.InvalidArgumentJSON("邮箱已存在", c)
+		return
+	}
+
 	// 事务处理
 	var aid int64
 	err = helper.GormDefaultDb.Transaction(func(tx *gorm.DB) error {
@@ -72,7 +83,7 @@ func AccountAdd(c *gin.Context) {
 			Avatar:   params.Avatar,
 			Email:    params.Email,
 			Phone:    params.Phone,
-			Status:   system.AccountStatusNormal,
+			Status:   model.StatusEnable,
 			Remark:   params.Remark,
 		}
 		if err := tx.Create(&newAccount).Error; err != nil {
@@ -91,7 +102,7 @@ func AccountAdd(c *gin.Context) {
 		response.LogicExceptionJSON("系统出错了："+err.Error(), c)
 		return
 	}
-	response.SuccessJSON(model.BaseIdReuslt{ID: aid}, "创建账号成功", c)
+	response.SuccessJSON(model.BaseIdResult{ID: aid}, "创建账号成功", c)
 }
 
 // AccountModify 修改账号
@@ -136,6 +147,19 @@ func AccountModify(c *gin.Context) {
 		}
 	}
 
+	// 判断邮箱是否存在
+	if params.Email != account.Email {
+		dbAccount, err := system.NewAccount().FindByEmail(params.Email)
+		if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+			response.LogicExceptionJSON("系统出错了："+err.Error(), c)
+			return
+		}
+		if dbAccount.ID > 0 {
+			response.InvalidArgumentJSON("邮箱已存在", c)
+			return
+		}
+	}
+
 	// 事务处理
 	err = helper.GormDefaultDb.Transaction(func(tx *gorm.DB) error {
 		// 修改账号
@@ -151,12 +175,12 @@ func AccountModify(c *gin.Context) {
 		}
 
 		// 添加新增角色
-		if err := system.NewAuthRelation().CreateRids(tx, account.ID, helper.DiffSilce(params.Rids, account.Rids)); err != nil {
+		if err := system.NewAuthRelation().CreateRids(tx, account.ID, helper.DiffSlice(params.Rids, account.Rids)); err != nil {
 			return err
 		}
 
 		// 删除弃用角色
-		if err := system.NewAuthRelation().DeleteRids(tx, account.ID, helper.DiffSilce(account.Rids, params.Rids)); err != nil {
+		if err := system.NewAuthRelation().DeleteRids(tx, account.ID, helper.DiffSlice(account.Rids, params.Rids)); err != nil {
 			return err
 		}
 
@@ -166,7 +190,7 @@ func AccountModify(c *gin.Context) {
 		response.LogicExceptionJSON("系统出错了："+err.Error(), c)
 		return
 	}
-	response.SuccessJSON(model.BaseIdReuslt{ID: account.ID}, "修改账号成功", c)
+	response.SuccessJSON(model.BaseIdResult{ID: account.ID}, "修改账号成功", c)
 }
 
 // AccountModifyPwd 修改账号密码
@@ -197,7 +221,7 @@ func AccountModifyPwd(c *gin.Context) {
 		response.LogicExceptionJSON("系统出错了："+err.Error(), c)
 		return
 	}
-	response.SuccessJSON(model.BaseIdReuslt{ID: account.ID}, "修改账号密码成功", c)
+	response.SuccessJSON(model.BaseIdResult{ID: account.ID}, "修改账号密码成功", c)
 }
 
 // AccountDelete 删除账号
@@ -237,5 +261,5 @@ func AccountDelete(c *gin.Context) {
 		response.LogicExceptionJSON("系统出错了："+err.Error(), c)
 		return
 	}
-	response.SuccessJSON(model.BaseIdReuslt{ID: account.ID}, "删除账号成功", c)
+	response.SuccessJSON(model.BaseIdResult{ID: account.ID}, "删除账号成功", c)
 }

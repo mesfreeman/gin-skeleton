@@ -39,19 +39,19 @@ func Login(c *gin.Context) {
 	// 获取账号信息
 	account, err := system.NewAccount().FindByUsername(params.Username)
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
-		go addLoginLog(c, params.Username, "", system.LoginLogOperTypeFail, "系统出错了："+err.Error())
+		go addLoginLog(c, params.Username, "", system.LoginLogTypeFail, "系统出错了："+err.Error())
 		response.LogicExceptionJSON("系统出错了："+err.Error(), c)
 		return
 	}
 	if account.ID == 0 || account.Password != system.NewAccount().EncryptPassword(params.Password) {
-		go addLoginLog(c, params.Username, account.Nickname, system.LoginLogOperTypeFail, "账号或密码错误")
+		go addLoginLog(c, params.Username, account.Nickname, system.LoginLogTypeFail, "账号或密码错误")
 		response.InvalidArgumentJSON("账号或密码错误", c)
 		return
 	}
 
 	// 判断是否允许登录
-	if account.Status == system.AccountStatusDisable {
-		go addLoginLog(c, params.Username, account.Nickname, system.LoginLogOperTypeFail, "账号已被禁用")
+	if account.Status == model.StatusDisable {
+		go addLoginLog(c, params.Username, account.Nickname, system.LoginLogTypeFail, "账号已被禁用")
 		response.ForbiddenJSON("账号已被禁用", c)
 		return
 	}
@@ -65,7 +65,7 @@ func Login(c *gin.Context) {
 	// 生成登录令牌
 	token, err := jwt.GenerateJwtToken(*account, tokenLifeTime)
 	if err != nil {
-		go addLoginLog(c, params.Username, account.Nickname, system.LoginLogOperTypeFail, "生成登录令牌出错了："+err.Error())
+		go addLoginLog(c, params.Username, account.Nickname, system.LoginLogTypeFail, "生成登录令牌出错了："+err.Error())
 		response.LogicExceptionJSON("系统出错了："+err.Error(), c)
 		return
 	}
@@ -73,13 +73,13 @@ func Login(c *gin.Context) {
 	// 更新最后登录时间并返回
 	account.LoginAt = model.LocalTime(time.Now())
 	helper.GormDefaultDb.Save(account)
-	go addLoginLog(c, params.Username, account.Nickname, system.LoginLogOperTypeSuccess, "")
+	go addLoginLog(c, params.Username, account.Nickname, system.LoginLogTypeSuccess, "")
 	response.SuccessJSON(gin.H{"token": token}, "登录成功", c)
 }
 
 // Logout 账号退出
 func Logout(c *gin.Context) {
-	go addLoginLog(c, middleware.GetTokenAuthInfo(c).Username, middleware.GetTokenAuthInfo(c).Nickname, system.LoginLogOperTypeLogout, "")
+	go addLoginLog(c, middleware.GetTokenAuthInfo(c).Username, middleware.GetTokenAuthInfo(c).Nickname, system.LoginLogTypeLogout, "")
 	response.SuccessJSON(gin.H{"id": middleware.GetTokenAuthInfo(c).ID}, "退出成功", c)
 }
 
@@ -96,11 +96,11 @@ func MyInfo(c *gin.Context) {
 	}
 
 	// 判断是否允许登录
-	if myInfo.Status == system.AccountStatusDisable {
+	if myInfo.Status == model.StatusDisable {
 		response.ForbiddenJSON("账号已被禁用", c)
 		return
 	}
-	response.SuccessJSON(myInfo, "登录成功", c)
+	response.SuccessJSON(myInfo, "获取我的个人信息成功", c)
 }
 
 // MyMenus 我的权限菜单
@@ -157,7 +157,7 @@ func ModifyMyPwd(c *gin.Context) {
 		response.LogicExceptionJSON("系统出错了："+err.Error(), c)
 		return
 	}
-	response.SuccessJSON(model.BaseIdReuslt{ID: account.ID}, "修改密码成功", c)
+	response.SuccessJSON(model.BaseIdResult{ID: account.ID}, "修改密码成功", c)
 }
 
 // ModifyMyInfo 修改我的个人信息
@@ -184,6 +184,19 @@ func ModifyMyInfo(c *gin.Context) {
 		return
 	}
 
+	// 判断邮箱是否已存在
+	if params.Email != account.Email {
+		dbAccount, err := system.NewAccount().FindByEmail(params.Email)
+		if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+			response.LogicExceptionJSON("系统出错了："+err.Error(), c)
+			return
+		}
+		if dbAccount.ID > 0 {
+			response.InvalidArgumentJSON("邮箱已存在", c)
+			return
+		}
+	}
+
 	// 更新账号信息
 	account.Nickname = params.Nickname
 	account.Email = params.Email
@@ -193,7 +206,7 @@ func ModifyMyInfo(c *gin.Context) {
 		response.LogicExceptionJSON("系统出错了："+err.Error(), c)
 		return
 	}
-	response.SuccessJSON(model.BaseIdReuslt{ID: account.ID}, "保存成功", c)
+	response.SuccessJSON(model.BaseIdResult{ID: account.ID}, "保存成功", c)
 }
 
 // LiteRoles 获取角色简单信息
@@ -202,7 +215,7 @@ func LiteRoles(c *gin.Context) {
 		ID   int64  `json:"id"`
 		Name string `json:"name"`
 	}
-	err := helper.GormDefaultDb.Model(system.NewRole()).Select("id, name").Where("status = ?", system.RoleStatusOn).
+	err := helper.GormDefaultDb.Model(system.NewRole()).Select("id, name").Where("status = ?", model.StatusEnable).
 		Order("weight desc, id asc").Find(&liteRoles).Error
 	if err != nil {
 		response.LogicExceptionJSON("系统出错了："+err.Error(), c)
@@ -217,7 +230,9 @@ func LiteAccounts(c *gin.Context) {
 		Email   string `json:"email"`
 		Account string `json:"account"`
 	}
-	err := helper.GormDefaultDb.Model(system.NewAccount()).Select("concat(nickname, '(', username, ')') as account, email").Where("status = ?", system.AccountStatusNormal).
+	err := helper.GormDefaultDb.Model(system.NewAccount()).
+		Select("concat(nickname, '(', username, ')') as account, email").
+		Where("status = ?", model.StatusEnable).
 		Find(&liteAccounts).Error
 	if err != nil {
 		response.LogicExceptionJSON("系统出错了："+err.Error(), c)
@@ -253,7 +268,7 @@ func UploadFile(c *gin.Context) {
 
 	// 判断文件类型是否支持
 	fileType := strings.TrimPrefix(path.Ext(file.Filename), ".")
-	if !helper.InSilce(fileType, fileConfig.AllowTypes) {
+	if !helper.InSlice(fileType, fileConfig.AllowTypes) {
 		response.InvalidArgumentJSON(fmt.Sprintf("文件类型暂不支持[%s]", fileType), c)
 		return
 	}
@@ -298,19 +313,19 @@ func UploadFile(c *gin.Context) {
 
 	// 返回结果
 	result := gin.H{
-		"id":       fileInfo.ID,
-		"fileName": fileInfo.FileName,
-		"fileSize": fileInfo.FileSize,
-		"fileType": fileInfo.FileType,
-		"fileUrl":  fileInfo.FileUrl,
-		"thumbail": fileInfo.Thumbnail,
-		"provider": fileInfo.Provider,
+		"id":        fileInfo.ID,
+		"fileName":  fileInfo.FileName,
+		"fileSize":  fileInfo.FileSize,
+		"fileType":  fileInfo.FileType,
+		"fileUrl":   fileInfo.FileUrl,
+		"thumbnail": fileInfo.Thumbnail,
+		"provider":  fileInfo.Provider,
 	}
 	response.SuccessJSON(result, "上传成功", c)
 }
 
 // 添加登录日志
-func addLoginLog(c *gin.Context, username, nickname string, operType int, remark string) {
+func addLoginLog(c *gin.Context, username, nickname string, logType int, remark string) {
 	userAgent := user_agent.New(c.Request.UserAgent())
 	browserName, browserVersion := userAgent.Browser()
 
@@ -321,7 +336,7 @@ func addLoginLog(c *gin.Context, username, nickname string, operType int, remark
 		Device:   userAgent.Platform(),
 		Os:       userAgent.OS(),
 		Browser:  browserName + " " + browserVersion,
-		OperType: operType,
+		Type:     logType,
 		Remark:   remark,
 	}
 	if err := helper.GormDefaultDb.Create(&loginLog).Error; err != nil {

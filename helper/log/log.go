@@ -85,7 +85,7 @@ func GetLogger(fileName string) *logrus.Logger {
 			rotatelogs.WithRotationTime(time.Duration(24)*time.Hour), // 日志切割时间间隔
 		)
 		if err != nil {
-			log.Fatal("Create rotatelogs object fail: ", err)
+			log.Fatal("Create rotate logs object fail: ", err)
 		}
 
 		// 为不同级别设置不同的输出目的

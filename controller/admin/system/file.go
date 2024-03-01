@@ -5,12 +5,14 @@ import (
 	"errors"
 
 	"gin-skeleton/helper"
+	"gin-skeleton/helper/log"
 	"gin-skeleton/helper/response"
 	"gin-skeleton/helper/tool"
 	"gin-skeleton/model"
 	"gin-skeleton/model/admin/system"
 
 	"github.com/gin-gonic/gin"
+	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 )
 
@@ -70,8 +72,11 @@ func FileDelete(c *gin.Context) {
 	// 调用三方服务删除文件
 	err = tool.NewStorage(fileConfig).DeleteFile(file.FileUrl)
 	if err != nil {
-		response.ThirdExceptionJSON("删除三方服务文件异常："+err.Error(), c)
-		return
+		log.GetLogger("file").WithFields(logrus.Fields{
+			"id":       file.ID,
+			"file_url": file.FileUrl,
+			"provider": fileConfig.Provider,
+		}).Error("删除文件异常：" + err.Error())
 	}
 
 	// 删除数据表的数据
@@ -80,7 +85,7 @@ func FileDelete(c *gin.Context) {
 		return
 	}
 
-	response.SuccessJSON(model.BaseIdReuslt{ID: file.ID}, "删除成功", c)
+	response.SuccessJSON(model.BaseIdResult{ID: file.ID}, "删除成功", c)
 }
 
 // FileViewConfig 查看文件配置
@@ -131,5 +136,5 @@ func FileSaveConfig(c *gin.Context) {
 		return
 	}
 
-	response.SuccessJSON(model.BaseIdReuslt{ID: id}, "", c)
+	response.SuccessJSON(model.BaseIdResult{ID: id}, "", c)
 }
