@@ -55,7 +55,7 @@ echo -e "$INFO Build gin-skeleton project, version is $LATEST_VERSION"
 go mod tidy
 go vet ./...
 CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags "-X 'gin-skeleton/helper.Version=$LATEST_VERSION' -X 'gin-skeleton/helper.BuildTime=$(date +%Y-%m-%d\ %H:%M:%S)'" -o release/gin-skeleton main.go
-CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags "-X 'gin-skeleton/helper.Version=$LATEST_VERSION' -X 'gin-skeleton/helper.BuildTime=$(date +%Y-%m-%d\ %H:%M:%S)'" -o release/gin-skeleton-cli cmd/main.go
+CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags "-X 'gin-skeleton/helper.Version=$LATEST_VERSION' -X 'gin-skeleton/helper.BuildTime=$(date +%Y-%m-%d\ %H:%M:%S)'" -o release/gin-cli cmd/main.go
 echo -e "$SUCCESS Build gin-skeleton:$LATEST_VERSION success"
 
 # Deploy the gin-skeleton project to the server
@@ -66,7 +66,7 @@ rsync -raze "ssh -p 20022 -l root" --exclude="storage/logs/*.log" "storage" "$SE
 rsync -raze "ssh -p 20022 -l root" "pm2.json" "$SERVER:$PROJECT_PATH/"
 
 # Initialize the gin-skeleton project
-ssh -p 20022 root@"$SERVER" "chmod +x $PROJECT_PATH/release/gin-skeleton*"
+ssh -p 20022 root@"$SERVER" "chmod +x $PROJECT_PATH/release/gin-*"
 ssh -p 20022 root@"$SERVER" "if [ ! -L $PROJECT_PATH/release/storage ]; then ln -s ../storage $PROJECT_PATH/release/storage; fi"
 ssh -p 20022 root@"$SERVER" "if [ ! -L $PROJECT_PATH/release/config ]; then ln -s ../config $PROJECT_PATH/release/config; fi"
 ssh -p 20022 root@"$SERVER" "chown -R root:root $PROJECT_PATH/"
