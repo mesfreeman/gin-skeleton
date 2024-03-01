@@ -90,17 +90,10 @@ func (cc *CommonConfig) CreateOrUpdateConfig(params *CommonConfig) (id int64, er
 
 	// 配置不存在，创建操作
 	if dbConfig.ID == 0 {
-		newConfig := CommonConfig{
-			Module:  params.Module,
-			Keyword: params.Keyword,
-			Value:   params.Value,
-			Remark:  params.Remark,
-		}
-
-		if err = helper.GormDefaultDb.Create(&newConfig).Error; err != nil {
+		if err = helper.GormDefaultDb.Create(&params).Error; err != nil {
 			return
 		}
-		id = newConfig.ID
+		id = params.ID
 		return
 	}
 
