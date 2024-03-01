@@ -15,13 +15,19 @@ func Test(c *gin.Context) {
 
 	result := struct {
 		Mode        string `json:"mode"`
+		Version     string `json:"version"`
 		Welcome     string `json:"welcome"`
 		ClientIp    string `json:"clientIp"`
+		BuildTime   string `json:"buildTime"`
+		StartTime   string `json:"startTime"`
 		CurrentTime string `json:"currentTime"`
 	}{
 		Mode:        viper.GetString("Server.Mode"),
-		Welcome:     "hello world!",
+		Welcome:     "Hello World!",
+		Version:     helper.Version,
 		ClientIp:    c.ClientIP(),
+		BuildTime:   helper.BuildTime,
+		StartTime:   helper.StartTime,
 		CurrentTime: time.Now().Format(helper.ToDateTimeString),
 	}
 	response.SuccessJSON(result, "", c)
