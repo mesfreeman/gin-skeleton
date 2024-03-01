@@ -28,13 +28,14 @@ type Account struct {
 
 // MyInfo 我的账号信息
 type MyInfo struct {
-	ID       int64  `json:"id"`
-	Username string `json:"username"`
-	Nickname string `json:"nickname"`
-	Email    string `json:"email"`
-	Phone    string `json:"phone"`
-	Avatar   string `json:"avatar"`
-	Status   int    `json:"-"`
+	ID       int64  `json:"id"`                // 账号ID
+	Username string `json:"username"`          // 账号
+	Nickname string `json:"nickname"`          // 昵称
+	Email    string `json:"email"`             // 邮箱
+	Phone    string `json:"phone"`             // 手机号
+	Avatar   string `json:"avatar"`            // 头像
+	HomePath string `json:"homePath" gorm:"-"` // 首页路径
+	Status   int    `json:"-"`                 // 状态：1-禁用，2-启用
 }
 
 // NewAccount 初始化账号
@@ -73,6 +74,13 @@ func (a *Account) GetAccountList(name string, status int, pageInfo model.BasePag
 // FindMyInfo 查找指定账号ID的个人信息
 func (a *Account) FindMyInfo(id int64) (loginInfo *MyInfo, err error) {
 	err = helper.GormDefaultDb.Model(NewAccount()).First(&loginInfo, id).Error
+	if err != nil {
+		return
+	}
+
+	// 获取首页路径
+	myMenus, _ := NewMenu().GetMyMenus(loginInfo.ID, loginInfo.Username)
+	loginInfo.HomePath, err = NewMenu().GetHomePath(myMenus)
 	return
 }
 

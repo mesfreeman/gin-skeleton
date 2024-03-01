@@ -89,6 +89,17 @@ func (m *Menu) GetMyMenus(aid int64, username string) (myMenus []*myMenu, err er
 	return
 }
 
+// GetHomePath 获取我的首页路径
+func (m *Menu) GetHomePath(myMenus []*myMenu) (path string, err error) {
+	for _, myMenu := range myMenus {
+		if myMenu.Children == nil && len(myMenu.Children) == 0 {
+			return myMenu.Path, nil
+		}
+		return m.GetHomePath(myMenu.Children)
+	}
+	return "", err
+}
+
 // GetMyPerms 获取我的权限代码
 func (m *Menu) GetMyPerms(aid int64, username string) (myPerms []string, err error) {
 	myPerms = make([]string, 0)
