@@ -44,15 +44,12 @@ func NewFile() *File {
 
 // GetFileList 获取文件列表
 func (f *File) GetFileList(keyword, uploader string, createdDate []string, pageInfo model.BasePageParams) (pr *model.BasePageResult[File], err error) {
-	fileModel := helper.GormDefaultDb.Model(NewFile())
+	fileModel := helper.GormDefaultDb.Model(NewFile()).Scopes(model.FilterByDate(createdDate, "created_at"))
 	if keyword != "" {
 		fileModel.Where("file_name like ? or remark like ?", "%"+keyword+"%", "%"+keyword+"%")
 	}
 	if uploader != "" {
 		fileModel.Where("username like ? or nickname like ?", "%"+uploader+"%", "%"+uploader+"%")
-	}
-	if len(createdDate) == 2 && createdDate[0] != "" && createdDate[1] != "" {
-		fileModel.Where("created_at >= ? and created_at <= ?", createdDate[0]+" 00:00:00", createdDate[1]+" 23:59:59")
 	}
 
 	pr = &model.BasePageResult[File]{Items: make([]*File, 0), Total: 0}
