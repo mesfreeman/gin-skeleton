@@ -9,7 +9,7 @@ import (
 
 // InitSystemRouter 初始化系统管理相关路由
 func InitSystemRouter(Router *gin.RouterGroup) {
-	SystemRouter := Router.Group("/system").Use(middleware.TokenAuth()).Use(middleware.PermAuth()).Use(middleware.OperateLog())
+	SystemRouter := Router.Group("/system").Use(middleware.TokenAuth(), middleware.PermAuth(), middleware.OperateLog())
 	{
 		// 账号管理
 		SystemRouter.POST("/account/list", system.AccountList)
