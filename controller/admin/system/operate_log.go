@@ -21,7 +21,7 @@ func OperateLogList(c *gin.Context) {
 		return
 	}
 
-	operateLogList, err := system.NewOerateLog().GetOperateLogList(params.Name, params.Function, params.CreatedDate, params.BasePageParams)
+	operateLogList, err := system.NewOperateLog().GetOperateLogList(params.Name, params.Function, params.CreatedDate, params.BasePageParams)
 	if err != nil {
 		response.LogicExceptionJSON("系统出错了："+err.Error(), c)
 		return
