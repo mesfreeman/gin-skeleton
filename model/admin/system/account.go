@@ -11,11 +11,6 @@ import (
 	"gorm.io/gorm"
 )
 
-const (
-	AccountStatusDisable = 1 // 状态 - 禁用
-	AccountStatusNormal  = 2 // 状态 - 启用
-)
-
 // Account  账号表
 type Account struct {
 	model.BaseModel
@@ -106,6 +101,12 @@ func (a *Account) FindFullInfo(id int64) (account *Account, err error) {
 // FindByUsername 基于账号查找账号信息
 func (a *Account) FindByUsername(username string) (account *Account, err error) {
 	err = helper.GormDefaultDb.Where("username = ?", username).First(&account).Error
+	return
+}
+
+// FindByEmail 基于邮箱查找账号信息
+func (a *Account) FindByEmail(email string) (account *Account, err error) {
+	err = helper.GormDefaultDb.Where("email = ?", email).First(&account).Error
 	return
 }
 

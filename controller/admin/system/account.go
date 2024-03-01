@@ -15,8 +15,8 @@ import (
 func AccountList(c *gin.Context) {
 	var params struct {
 		model.BasePageParams
-		Name   string `json:"name" remark:"账号名" binding:"max=32"`
-		Status int    `json:"status" remark:"状态" binding:"oneof=0 1 2"`
+		Name   string `json:"name" remark:"账号名"`
+		Status int    `json:"status" remark:"状态"`
 	}
 	if err := c.ShouldBindJSON(&params); err != nil {
 		response.ValidatorFailedJson(err, c)
@@ -61,6 +61,17 @@ func AccountAdd(c *gin.Context) {
 		return
 	}
 
+	// 判断邮箱是否存在
+	dbAccount, err = system.NewAccount().FindByEmail(params.Email)
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		response.LogicExceptionJSON("系统出错了："+err.Error(), c)
+		return
+	}
+	if dbAccount.ID > 0 {
+		response.InvalidArgumentJSON("邮箱已存在", c)
+		return
+	}
+
 	// 事务处理
 	var aid int64
 	err = helper.GormDefaultDb.Transaction(func(tx *gorm.DB) error {
@@ -72,7 +83,7 @@ func AccountAdd(c *gin.Context) {
 			Avatar:   params.Avatar,
 			Email:    params.Email,
 			Phone:    params.Phone,
-			Status:   system.AccountStatusNormal,
+			Status:   model.StatusEnable,
 			Remark:   params.Remark,
 		}
 		if err := tx.Create(&newAccount).Error; err != nil {
@@ -132,6 +143,19 @@ func AccountModify(c *gin.Context) {
 		}
 		if dbAccount.ID > 0 {
 			response.InvalidArgumentJSON("账号已存在", c)
+			return
+		}
+	}
+
+	// 判断邮箱是否存在
+	if params.Email != account.Email {
+		dbAccount, err := system.NewAccount().FindByEmail(params.Email)
+		if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+			response.LogicExceptionJSON("系统出错了："+err.Error(), c)
+			return
+		}
+		if dbAccount.ID > 0 {
+			response.InvalidArgumentJSON("邮箱已存在", c)
 			return
 		}
 	}
