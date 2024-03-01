@@ -39,6 +39,11 @@ func InitSystemRouter(Router *gin.RouterGroup) {
 		// 邮件配置
 		SystemRouter.POST("/email/viewConfig", system.EmailViewConfig)
 		SystemRouter.POST("/email/saveConfig", system.EmailSaveConfig)
+		SystemRouter.POST("/email/templateList", system.EmailTemplateList)
+		SystemRouter.POST("/email/templateAdd", system.EmailTemplateAdd)
+		SystemRouter.POST("/email/templateModify", system.EmailTemplateModify)
+		SystemRouter.POST("/email/templateDelete", system.EmailTemplateDelete)
+		SystemRouter.POST("/email/batchSend", system.EmailBatchSend)
 
 		// 登录日志
 		SystemRouter.POST("/loginLog/list", system.LoginLogList)
