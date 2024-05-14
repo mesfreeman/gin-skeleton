@@ -55,4 +55,4 @@ go run main.go
 
 * `server`：服务器地址，默认值：`tank.server.cn`
 * `project_path`：项目路径，默认值：`/data/services/projects/gin-skeleton/code`
-* 注：该脚本依赖`pm2`服务，请自行安装并基于实际情况调整 `deploy.sh` 中的相关配置。
+* 注：该脚本依赖 `pm2` 服务，请自行安装并基于实际情况调整 `deploy.sh` 中的相关配置。
