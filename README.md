@@ -26,8 +26,6 @@
 
 ## 部署说明
 
-使用`Makefile`来完成项目初始化及服务的启动、重启等操作，如下：
-
 ### 一、本地开发
 
 #### 1. 项目初始化
@@ -57,4 +55,4 @@ go run main.go
 
 * `server`：服务器地址，默认值：`tank.server.cn`
 * `project_path`：项目路径，默认值：`/data/services/projects/gin-skeleton/code`
-* 注：请基于实际情况调整 `deploy.sh` 中的相关配置。
+* 注：该脚本依赖`pm2`服务，请自行安装并基于实际情况调整 `deploy.sh` 中的相关配置。
